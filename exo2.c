@@ -136,7 +136,7 @@ double dot3 (vector X, vector Y)
     dot += X [i + 1] * Y [i + 1];
     dot += X [i + 2] * Y [i + 2];
     dot += X [i + 3] * Y [i + 3];
-    
+
     dot += X [i + 4] * Y [i + 4];
     dot += X [i + 5] * Y [i + 5];
     dot += X [i + 6] * Y [i + 6];
@@ -152,8 +152,6 @@ void mult_mat_vect0 (matrix M, vector b, double *c)
     matrix vector multiplication
     Sequential function
   */
-  
-  
   return ;
 }
 
