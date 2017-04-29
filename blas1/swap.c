@@ -17,6 +17,41 @@ void mncblas_sswap(const int N, float *X, const int incX,
   return ;
 }
 
+void mncblas_sswap_omp(const int N, float *X, const int incX, 
+                 float *Y, const int incY)
+{
+  register unsigned int i = 0 ;
+  register unsigned int j = 0 ;
+  register float save ;
+  
+  #pragma omp for
+  for (; ((i < N) && (j < N)) ; i += incX, j+=incY)
+    {
+      save = Y [j] ;
+      Y [j] = X [i] ;
+      X [i] = save ;
+    }
+
+  return ;
+}
+
+void mncblas_sswap_vec(const int N, float *X, const int incX, 
+                 float *Y, const int incY)
+{
+  register unsigned int i = 0 ;
+  register unsigned int j = 0 ;
+  register float save ;
+  
+  for (; ((i < N) && (j < N)) ; i += incX, j+=incY)
+    {
+      save = Y [j] ;
+      Y [j] = X [i] ;
+      X [i] = save ;
+    }
+
+  return ;
+}
+
 void mncblas_dswap(const int N, double *X, const int incX, 
                  double *Y, const int incY)
 {
