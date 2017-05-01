@@ -6,6 +6,7 @@
 #define NUM_THREADS 2
 
 typedef float float4 [4] __attribute__ ((aligned (16))) ;
+typedef double double2 [2] __attribute__ ((aligned (16))) ;
 
 void mncblas_saxpy_vec (const int N, const float alpha, const float *X,
 		    const int incX, float *Y, const int incY)
@@ -92,13 +93,33 @@ void mncblas_daxpy(const int N, const double alpha, const double *X,
   return ;
 }
 
-void mncblas_daxpy_1(const int N, const double alpha, const double *X,
+void mncblas_daxpy_vec(const int N, const double alpha, const double *X,
        const int incX, double *Y, const int incY)
 {
   /*
     to be completed
   */
+  register unsigned int i ;
+  register unsigned int j ;
+
+  double2 alpha2 ;
   
+  __m128d x1, x2, y1, y2 ;
+  __m128d alpha1;
+
+  alpha2 [0] = alpha;
+  alpha2 [1] = alpha;
+  
+  alpha1 = _mm_load_ps (alpha2) ;  
+  
+  for (i = 0, j = 0 ; j < N; i += 2, j += 2)
+    {
+      x1 = _mm_load_pd (X+i) ;
+      y1 = _mm_load_pd (Y+i) ;
+      x2 = _mm_mul_pd (x1, alpha1) ;
+      y2 = _mm_add_pd (y1, x2) ;
+      _mm_store_pd (Y+i, y2) ;
+    }
   return ;
 }
 
