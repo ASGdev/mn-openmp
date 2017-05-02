@@ -3,12 +3,14 @@
 #include "mnblas.h"
 
 #include <nmmintrin.h>
+#include <stdio.h>
+
 
 typedef float *floatM;
-
+typedef double matrix [4][4] ;
 typedef float float4 [4]  __attribute__ ((aligned (16))) ;
 
-void mncblas_sgemm (
+void mncblas_sgemm_vec (
 		    MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
 		    MNCBLAS_TRANSPOSE TransB, const int M, const int N,
 		    const int K, const float alpha, const float *A,
@@ -116,7 +118,7 @@ void mncblas_sgemm (
 }
 
 
-void mncblas_sgemm_1 (
+void mncblas_sgemm (
 		      MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
 		      MNCBLAS_TRANSPOSE TransB, const int M, const int N,
 		      const int K, const float alpha, const float *A,
@@ -231,3 +233,31 @@ void mncblas_zgemm (
   return ;
 }
 
+
+void print_matrix (matrix M)
+{
+  register unsigned int i, j ;
+
+  for (i = 0 ; i < N; i++)
+    {
+      for (j = 0 ; j < N; j++)
+	{
+	  printf (" %3.2f ", M[i][j]) ;
+	}
+      printf ("\n") ;
+    }
+  printf ("\n") ;
+  return ;
+}
+
+int main(){
+	matrix M = {
+	    {1, 1, 1, 1},
+	    {1, 1, 1, 1},
+	    {1, 1, 1, 1},
+	    {1, 1, 1, 1}
+  	};
+	double *pm = &M;
+
+	return 0;
+}

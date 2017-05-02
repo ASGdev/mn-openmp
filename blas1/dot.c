@@ -7,6 +7,12 @@
 typedef float float4 [4] __attribute__ ((aligned (16))) ;
 typedef double double2 [2] __attribute__ ((aligned (16))) ;
 
+void printvec(float v[], int size){
+  for(int i = 0 ; i<size; i++)
+    printf("%f ", v[i]);
+
+  printf("\n");
+}
 
 float mncblas_sdot(const int N, const float *X, const int incX, 
                  const float *Y, const int incY)
@@ -109,7 +115,7 @@ double mncblas_ddot_vec(const int N, const double *X, const int incX,
   return (fdot[0] + fdot[1]) ;
 }
 
-void   mncblas_cdotu_sub(const int N, const void *X, const int incX,
+void mncblas_cdotu_sub(const int N, const void *X, const int incX,
                        const void *Y, const int incY, void *dotu)
 {
   /* a completer */
@@ -120,8 +126,36 @@ void   mncblas_cdotu_sub(const int N, const void *X, const int incX,
 void   mncblas_cdotc_sub(const int N, const void *X, const int incX,
                        const void *Y, const int incY, void *dotc)
 {
-  /* a completer */
-  
+  /* conj(X)*Y */
+  register unsigned int i = 0 ;
+  register unsigned int j = 0 ;
+
+  float *XP = (float *) X;
+  float *YP = (float *) Y;
+
+  float v3[5], reel, imag;
+  float reelContainer[4];
+
+  __m128 dot = _mm_set1_ps(0.0);
+  __m128 conj, R;
+
+  double2 fdot;
+
+  for (; ((i < N) && (j < N)) ; i += incX + 4, j+=incY + 4)
+    {
+      // conjugé
+      __m128 temp = _mm_load_ps(XP+i);
+      conj = _mm_sub_ps(_mm_set1_ps(0.0), temp);
+      _mm_store_ps(v3+i, conj);
+
+      //temp
+      R = _mm_mul_ps(conj, _mm_load_ps(Y+i));
+
+      // reel
+
+    }
+
+  printvec(v3, 5);
   return ;
 }
 
@@ -142,19 +176,16 @@ void   mncblas_zdotc_sub(const int N, const void *X, const int incX,
 }
 
 /* FOR TEST PURPOSES */
-void printvec(double v[], int size){
-  for(int i = 0 ; i<size; i++)
-    printf("%f ", v[i]);
 
-  printf("\n");
-}
 
 int main(){
-  double v1[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
-  double v2[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
+  float v1[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
+  float v2[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
+  float v3[5];
 
-  printf("Dot d seq : %f\n", mncblas_ddot(5, v1, 1, v2, 1));
-  printf("Dot d p : %f\n", mncblas_ddot_omp(5, v1, 1, v2, 1));
-  printf("Dot d vec : %f\n", mncblas_ddot_vec(5, v1, 0, v2, 0));
-
+  // printf("Dot d seq : %f\n", mncblas_ddot(5, v1, 1, v2, 1));
+  // printf("Dot d p : %f\n", mncblas_ddot_omp(5, v1, 1, v2, 1));
+  // printf("Dot d vec : %f\n", mncblas_ddot_vec(5, v1, 0, v2, 0));
+  mncblas_cdotc_sub(5, v1, 0, v2, 0, v3);
+  
 }

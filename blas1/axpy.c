@@ -7,16 +7,16 @@
 typedef struct {
   float REEL;
   float IMAG;
-} _fcomplexe;
+} vcomplexe;
 
-typedef _fcomplexe VFCOMP [VEC_SIZE] ;
+typedef vcomplexe VCOMP [VEC_SIZE] ;
 
 typedef struct {
   double REEL;
   double IMAG;
-} _dcomplexe;
+} dcomplexe;
 
-typedef _dcomplexe VDCOMP [VEC_SIZE] ;
+typedef dcomplexe DCOMP [VEC_SIZE] ;
 
 #define NUM_PROC 2
 #define NUM_THREADS 2
@@ -176,14 +176,46 @@ void mncblas_daxpy_omp (const int N, const double alpha, const double *X,
 void mncblas_caxpy(const int N, const void *alpha, const void *X,
 		   const int incX, void *Y, const int incY)
 {
-  /*
-    to be completed
-  */
+    register unsigned int i = 0 ;
+    register unsigned int j = 0 ;
+    float *XP = (float *) X;
+    float *YP = (float *) Y;
+    float *AP = (float *) alpha;
+    register float reel;
+    register float imag;
+    vcomplexe temp;
+
+    for (; ((i < N*2) && (j < N*2)) ; i += incX +1 , j+=incY +1){
+      temp.REEL = (AP[0] * *(XP+i)) - (AP[1] * *(XP+i+1));
+      temp.IMAG = (AP[0] * *(XP+i+1)) + (AP[1] * *(XP+i));
+      *(YP+j) = temp.REEL + YP[j];
+      *(YP+j+1) = temp.IMAG + *(YP+j+1);
+    }
 
   return ;
 }
 
 void mncblas_zaxpy(const int N, const void *alpha, const void *X,
+       const int incX, void *Y, const int incY)
+{
+    register unsigned int i = 0 ;
+    register unsigned int j = 0 ;
+    double *XP = (double *) X;
+    double *YP = (double *) Y;
+    double *AP = (double *) alpha;
+    register double reel;
+    register double imag;
+    dcomplexe temp;
+
+    for (; ((i < N*2) && (j < N*2)) ; i += incX +1 , j+=incY +1){
+      temp.REEL = (AP[0] * *(XP+i)) - (AP[1] * *(XP+i+1));
+      temp.IMAG = (AP[0] * *(XP+i+1)) + (AP[1] * *(XP+i));
+      *(YP+j) = temp.REEL + YP[j];
+      *(YP+j+1) = temp.IMAG + *(YP+j+1);
+    }
+}
+
+void mncblas_zaxpy_omp(const int N, const void *alpha, const void *X,
 		   const int incX, void *Y, const int incY)
 {
     // register unsigned int i = 0 ;
@@ -210,6 +242,26 @@ void mncblas_zaxpy(const int N, const void *alpha, const void *X,
   return ;
 }
 
+void mncblas_zaxpy_vec(const int N, const void *alpha, const void *X,
+       const int incX, void *Y, const int incY)
+{
+    register unsigned int i = 0 ;
+    register unsigned int j = 0 ;
+    double *XP = (double *) X;
+    double *YP = (double *) Y;
+    double *AP = (double *) alpha;
+    register double reel;
+    register double imag;
+    dcomplexe temp;
+
+    for (; ((i < N*2) && (j < N*2)) ; i += incX +1 , j+=incY +1){
+      temp.REEL = (AP[0] * *(XP+i)) - (AP[1] * *(XP+i+1));
+      temp.IMAG = (AP[0] * *(XP+i+1)) + (AP[1] * *(XP+i));
+      *(YP+j) = temp.REEL + YP[j];
+      *(YP+j+1) = temp.IMAG + *(YP+j+1);
+    }
+}
+
 /* FOR TEST PURPOSES */
 void printvec(double v[], int size){
   for(int i = 0 ; i<size; i++)
@@ -218,15 +270,26 @@ void printvec(double v[], int size){
   printf("\n");
 }
 
-int main(){
-  double v1[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
-  double v2[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
-  const double a = 2;
+void printvec2(VCOMP v){
+  for(int i = 0 ; i< VEC_SIZE; i++){
+    vcomplexe cc = v[i];
+    printf("(%f, %f) ", cc.REEL, cc.IMAG);
+  }
 
-  printvec(v1, 5);
-  printvec(v2, 5);
-  mncblas_daxpy_omp (5, a, v1, 1, v2, 1);
-  printvec(v2, 5);
+  printf("\n");
+}
+
+int main(){
+  VCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
+  VCOMP V2 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
+
+  vcomplexe a = {1.0, 2.0};
+  vcomplexe *p1 = &a;
+
+  //printvec2(V1);
+  //printvec2(V2);
+  mncblas_caxpy (5, p1, V1, 1, V2, 1);
+  printvec2(V2);
 }
 
 

@@ -195,21 +195,35 @@ void mncblas_zswap(const int N, void *X, const int incX,
 void mncblas_zswap_vec(const int N, void *X, const int incX, 
                         void *Y, const int incY)
 {
+  register unsigned int i = 0 ;
+  register unsigned int j = 0 ;
+  double *XP = (double *) X;
+  double *YP = (double *) Y;
+
+    __m128d saveX;
+
+  for (; ((i < N*2) && (j < N*2)) ; i += incX + 2, j+=incY + 2)
+    {
+      saveX = _mm_load_pd(XP+i);
+      _mm_store_pd(XP+i, _mm_load_pd(YP+i)) ;
+      _mm_store_pd(YP+i, saveX) ;
+
+    }
 
   return ;
 }
 
 /* FOR TEST PURPOSES */
-void printvec(float v[], int size){
+void printvec(double v[], int size){
   for(int i = 0 ; i<size; i++)
     printf("%f ", v[i]);
 
   printf("\n");
 }
 
-void printvec2(VCOMP v){
+void printvec2(DCOMP v){
   for(int i = 0 ; i< VEC_SIZE; i++){
-    vcomplexe cc = v[i];
+    dcomplexe cc = v[i];
     printf("(%f, %f) ", cc.REEL, cc.IMAG);
   }
 
@@ -226,13 +240,13 @@ int main(){
   // printvec(v1, 5);
   // printvec(v2, 5);
 
-  VCOMP V1 = {{1.0, 1.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
-  VCOMP V2 = {{6.0, 6.0}, {7.0, 7.0}, {8.0, 8.0}, {9.0, 9.0}, {10.0, 10.0}};
+  DCOMP V1 = {{1.0, 1.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
+  DCOMP V2 = {{6.0, 6.0}, {7.0, 7.0}, {8.0, 8.0}, {9.0, 9.0}, {10.0, 10.0}};
 
   printvec2(V1);
   printvec2(V2);
 
-  mncblas_cswap_vec(5, V1, 0, V2, 0);
+  mncblas_zswap_vec(5, V1, 0, V2, 0);
 
   printvec2(V1);
   printvec2(V2);
