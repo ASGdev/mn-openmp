@@ -1,6 +1,12 @@
 #include "mnblas.h"
 #include <x86intrin.h>
+#include <emmintrin.h>
 #include <stdio.h>
+
+#define XMM_NUMBER 8
+typedef float float4 [4] __attribute__ ((aligned (16))) ;
+typedef double double2 [2] __attribute__ ((aligned (16))) ;
+
 
 float mncblas_sdot(const int N, const float *X, const int incX, 
                  const float *Y, const int incY)
@@ -22,18 +28,20 @@ float mncblas_sdot_vec(const int N, const float *X, const int incX,
 {
   register unsigned int i = 0 ;
   register unsigned int j = 0 ;
-  register float dot = 0.0 ; // to be aligned ? -> no need as it is not in memory
 
-  // Use _mm_mul et _mm_add
-  
-  __m128 x, y;
-  for (; ((i < N) && (j < N)) ; i += incX, j+=incY)
+  __m128 dot = _mm_set1_ps(0.0);
+
+  float4 fdot;
+
+  for (; ((i < N) && (j < N)) ; i += incX + 4, j+=incY + 4)
     {
-      dot = dot + X [i] * Y [j] ;
+      dot = _mm_add_ps(dot, _mm_mul_ps (_mm_load_ps (X+i), _mm_load_ps (Y+i)));
     }
 
-  return dot ;
+  _mm_store_ps(fdot, dot);
+  return (fdot[0] + fdot[1] + fdot[2] + fdot[3]) ;
 }
+
 
 float mncblas_sdot_omp(const int N, const float *X, const int incX, 
                  const float *Y, const int incY)
@@ -87,15 +95,18 @@ double mncblas_ddot_vec(const int N, const double *X, const int incX,
 {
   register unsigned int i = 0 ;
   register unsigned int j = 0 ;
-  register double dot = 0.0 ;
 
-  __m128d x, y;
-  for (; ((i < N) && (j < N)) ; i += incX, j+=incY)
+  __m128d dot = _mm_set1_pd(0.0);
+
+  double2 fdot;
+
+  for (; ((i < N) && (j < N)) ; i += incX + 2, j+=incY + 2)
     {
-      dot = dot + X [i] * Y [j] ;
+      dot = _mm_add_pd(dot, _mm_mul_pd (_mm_load_pd (X+i), _mm_load_pd (Y+i)));
     }
 
-  return dot ;
+  _mm_store_pd(fdot, dot);
+  return (fdot[0] + fdot[1]) ;
 }
 
 void   mncblas_cdotu_sub(const int N, const void *X, const int incX,
@@ -144,6 +155,6 @@ int main(){
 
   printf("Dot d seq : %f\n", mncblas_ddot(5, v1, 1, v2, 1));
   printf("Dot d p : %f\n", mncblas_ddot_omp(5, v1, 1, v2, 1));
-  printf("Dot d vec : %f\n", mncblas_ddot_vec(5, v1, 1, v2, 1));
+  printf("Dot d vec : %f\n", mncblas_ddot_vec(5, v1, 0, v2, 0));
 
 }

@@ -2,6 +2,22 @@
 #include <stdio.h>
 #include <x86intrin.h>
 
+#define VEC_SIZE 5
+
+typedef struct {
+  float REEL;
+  float IMAG;
+} _fcomplexe;
+
+typedef _fcomplexe VFCOMP [VEC_SIZE] ;
+
+typedef struct {
+  double REEL;
+  double IMAG;
+} _dcomplexe;
+
+typedef _dcomplexe VDCOMP [VEC_SIZE] ;
+
 #define NUM_PROC 2
 #define NUM_THREADS 2
 

@@ -3,42 +3,59 @@
 #include <x86intrin.h>
 #include <emmintrin.h>
 
+#define VEC_SIZE 5
+
+typedef struct {
+  float REEL;
+  float IMAG;
+}vcomplexe;
+
+typedef vcomplexe VCOMP [VEC_SIZE] ;
+
+typedef struct {
+  double REEL;
+  double IMAG;
+}dcomplexe;
+
+typedef dcomplexe DCOMP [VEC_SIZE] ;
+
+
 void mncblas_scopy(const int N, const float *X, const int incX, 
-                 float *Y, const int incY)
+				 float *Y, const int incY)
 {
   register unsigned int i = 0 ;
   register unsigned int j = 0 ;
 
   for (; ((i < N) && (j < N)) ; i = i + incX + 4, j = j + incY + 4)
-    {
-      Y [j] = X [i] ;
-      Y [j+1] = X [i+1] ;
-      Y [j+2] = X [i+2] ;
-      Y [j+3] = X [i+3] ;
-    }
+	{
+	  Y [j] = X [i] ;
+	  Y [j+1] = X [i+1] ;
+	  Y [j+2] = X [i+2] ;
+	  Y [j+3] = X [i+3] ;
+	}
   return ;
 }
 
 void mncblas_scopy_omp(const int N, const float *X, const int incX, 
-                 float *Y, const int incY)
+				 float *Y, const int incY)
 {
   register unsigned int i = 0 ;
   register unsigned int j = 0 ;
 
   #pragma omp for schedule(static)
   for (; ((i < N) && (j < N)) ; i = i + incX + 4, j = j + incY + 4)
-    {
-      Y [j] = X [i] ;
-      Y [j+1] = X [i+1] ;
-      Y [j+2] = X [i+2] ;
-      Y [j+3] = X [i+3] ;
-    }
+	{
+	  Y [j] = X [i] ;
+	  Y [j+1] = X [i+1] ;
+	  Y [j+2] = X [i+2] ;
+	  Y [j+3] = X [i+3] ;
+	}
 
   return ;
 }
 
 void mncblas_scopy_vec(const int N, const float *X, const int incX, 
-                 float *Y, const int incY)
+				 float *Y, const int incY)
 {
   register unsigned int i = 0 ;
   register unsigned int j = 0 ;
@@ -46,45 +63,45 @@ void mncblas_scopy_vec(const int N, const float *X, const int incX,
   __m128 v;
 
   for (; ((i < N) && (j < N)) ; i = i + incX + 4, j = j + incY + 4)
-    {
-      v = _mm_load_ps(X+i);
-      _mm_store_ps (Y+i, v) ;
-    }
+	{
+	  v = _mm_load_ps(X+i);
+	  _mm_store_ps (Y+i, v) ;
+	}
 
   return ;
 }
 
 void mncblas_dcopy(const int N, const double *X, const int incX, 
-                 double *Y, const int incY)
+				 double *Y, const int incY)
 {
   register unsigned int i = 0 ;
   register unsigned int j = 0 ;
 
   for (; ((i < N) && (j < N)) ; i = i * incX + 2, j = j * incY + 2)
-    {
-      Y [j] = X [i] ;
-      Y [j+1] = X [i+1] ;
-    }
+	{
+	  Y [j] = X [i] ;
+	  Y [j+1] = X [i+1] ;
+	}
   return ;
 }
 
 void mncblas_dcopy_omp(const int N, const double *X, const int incX, 
-                 double *Y, const int incY)
+				 double *Y, const int incY)
 {
   register unsigned int i = 0 ;
   register unsigned int j = 0 ;
 
   #pragma omp for schedule(static) private(i, j)
   for (; ((i < N) && (j < N)) ; i = i + incX + 2, j = j + incY + 2)
-    {
-      Y [j] = X [i] ;
-      Y [j+1] = X [i+1] ;
-    }
+	{
+	  Y [j] = X [i] ;
+	  Y [j+1] = X [i+1] ;
+	}
   return ;
 }
 
 void mncblas_dcopy_vec(const int N, const double *X, const int incX, 
-                 double *Y, const int incY)
+				 double *Y, const int incY)
 {
   register unsigned int i = 0 ;
   register unsigned int j = 0 ;
@@ -92,36 +109,103 @@ void mncblas_dcopy_vec(const int N, const double *X, const int incX,
   __m128d v;
 
   for (; ((i < N) && (j < N)) ; i = i + incX + 2, j = j + incY + 2)
-    {
-      v = _mm_load_pd(X+i);
-      _mm_store_pd(Y+i, v) ;
-    }
+	{
+	  v = _mm_load_pd(X+i);
+	  _mm_store_pd(Y+i, v) ;
+	}
 
   return ;
 }
 
-void mncblas_ccopy(const int N, const void *X, const int incX, 
-		                    void *Y, const int incY)
+void mncblas_ccopy_vec(const int N, const void *X, const int incX, 
+							void *Y, const int incY)
 {
+  register unsigned int i = 0 ;
+  register unsigned int j = 0 ;
+  float *XP = (float *) X;
+  float *YP = (float *) Y;
+
+  for (; ((i < N*2) && (j < N*2)) ; i = i + incX + 4, j = j + incY + 4)
+	{
+	  _mm_store_ps(YP+j, _mm_load_ps(XP+i)) ;
+	}
+
+  return ;
+
+}
+
+void mncblas_ccopy(const int N, const void *X, const int incX, 
+							void *Y, const int incY)
+{
+  register unsigned int i = 0 ;
+  register unsigned int j = 0 ;
+  float *XP = (float *) X;
+  float *YP = (float *) Y;
+
+  for (; ((i < N*2) && (j < N*2)) ; i += incX + 4, j += incY + 4){
+		YP[j] = XP[i] ;
+		YP[j+1] = XP[i+1] ;
+		YP[j+2] = XP[i+2];
+		YP[j+3] = XP[i+3];
+	}
+
+  return ;
 
 }
 
 void mncblas_zcopy(const int N, const void *X, const int incX, 
-		                    void *Y, const int incY)
+							void *Y, const int incY)
 {
+	register unsigned int i = 0 ;
+	register unsigned int j = 0 ;
+	double *XP = (double *) X;
+	double *YP = (double *) Y;
+
+	for (; ((i < N*2) && (j < N*2)) ; i += incX + 2, j += incY + 2){
+		YP[j] = XP[i] ;
+		YP[j+1] = XP[i+1] ;
+		YP[j+2] = XP[i+2];
+		YP[j+3] = XP[i+3];
+	}
+}
+
+void mncblas_zcopy_vec(const int N, const void *X, const int incX, 
+							void *Y, const int incY)
+{
+	register unsigned int i = 0 ;
+	register unsigned int j = 0 ;
+	double *XP = (double *) X;
+	double *YP = (double *) Y;
+
+	for (; ((i < N*2) && (j < N*2)) ; i = i + incX + 2, j = j + incY + 2)
+	{
+	  _mm_store_pd(YP+i, _mm_load_pd(XP+i)) ;
+	}
+
+	return ;
 
 }
+
 
 /* FOR TEST PURPOSES */
 void printvec(double v[], int size){
   for(int i = 0 ; i<size; i++)
-    printf("%f ", v[i]);
+	printf("%f ", v[i]);
 
   printf("\n");
 }
 
+void printvec2(VCOMP v){
+	for(int i = 0 ; i< VEC_SIZE; i++){
+		vcomplexe cc = v[i];
+		printf("(%f, %f) ", cc.REEL, cc.IMAG);
+	}
+
+	printf("\n");
+}
+
 int main(){
-  double v1[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
+  //double v1[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
 
   // double v2[5];
   // printvec(v2, 5);
@@ -134,8 +218,26 @@ int main(){
   // mncblas_dcopy_vec(5, v1, 0, v3, 0);
   // printvec(v3, 5);
 
-  double v4[5];
-  printvec(v4, 5);
-  mncblas_dcopy_omp(5, v1, 0, v4, 0);
-  printvec(v4, 5);
+  // double v4[5];
+  // printvec(v4, 5);
+  // mncblas_dcopy_omp(5, v1, 0, v4, 0);
+  // printvec(v4, 5);
+
+  VCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 8.0}};
+  VCOMP V2;
+
+  printvec2(V1);
+  // mncblas_ccopy_vec(5, V1, 0, V2, 0);
+  mncblas_ccopy(5, V1, 0, V2, 0);
+  printvec2(V2);
+
+  // DCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {5.0, 8.0}};
+  // DCOMP V2, V3;
+
+  // printvec2(V1);
+  // mncblas_zcopy_vec(5, V1, 0, V2, 0);
+  // printvec2(V2);
+  // mncblas_zcopy(5, V1, 0, V3, 0);
+  // printvec2(V3);
+
 }
