@@ -184,7 +184,7 @@ void   mncblas_cdotc_sub_vec(const int N, const void *X, const int incX,
       // reel
 
     }
-
+  // vertical sum : _mm_hadd_ps()
   printvec(v3, 5);
   return ;
 }
