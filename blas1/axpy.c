@@ -31,7 +31,7 @@ void mncblas_saxpy_vec (const int N, const float alpha, const float *X,
   register unsigned int j ;
 
   float4 alpha4 ;
-  
+
   __m128 x1, x2, y1, y2 ;
   __m128 alpha1;
 
@@ -40,8 +40,8 @@ void mncblas_saxpy_vec (const int N, const float alpha, const float *X,
   alpha4 [2] = alpha;
   alpha4 [3] = alpha;
 
-  alpha1 = _mm_load_ps (alpha4) ;  
-  
+  alpha1 = _mm_load_ps (alpha4) ;
+
   for (i = 0, j = 0 ; j < N; i += 4, j += 4)
     {
       x1 = _mm_load_ps (X+i) ;
@@ -60,17 +60,15 @@ void mncblas_saxpy_omp (const int N, const float alpha, const float *X,
   /*
     scalar version with unrolled loop
   */
-  
-  register unsigned int i ;
   register unsigned int j ;
 
-  #pragma omp for schedule(static) private(i, j)
-  for (i = 0, j = 0 ; j < N; i += 4, j += 4)
+  #pragma omp for schedule(static)
+  for (j = 0 ; j < N;j += 4)
     {
-      Y [j] = alpha * X[i] + Y[j] ; 
-      Y [j+1] = alpha * X[i+1] + Y[j+1] ;
-      Y [j+2] = alpha * X[i+2] + Y[j+2] ;
-      Y [j+3] = alpha * X[i+3] + Y[j+3] ;   
+      Y [j] = alpha * X[j] + Y[j] ;
+      Y [j+1] = alpha * X[j+1] + Y[j+1] ;
+      Y [j+2] = alpha * X[j+2] + Y[j+2] ;
+      Y [j+3] = alpha * X[j+3] + Y[j+3] ;
     }
 
   return ;
@@ -82,44 +80,18 @@ void mncblas_saxpy (const int N, const float alpha, const float *X,
   /*
     scalar version with unrolled loop
   */
-  
-  register unsigned int i ;
   register unsigned int j ;
 
-  for (i = 0, j = 0 ; j < N; i += 4, j += 4)
+  for (j = 0 ; j < N; j += 4)
     {
-      Y [j] = alpha * X[i] + Y[j] ; 
-      Y [j+1] = alpha * X[i+1] + Y[j+1] ;
-      Y [j+2] = alpha * X[i+2] + Y[j+2] ;
-      Y [j+3] = alpha * X[i+3] + Y[j+3] ;   
+      Y [j] = alpha * X[j] + Y[j] ;
+      Y [j+1] = alpha * X[j+1] + Y[j+1] ;
+      Y [j+2] = alpha * X[j+2] + Y[j+2] ;
+      Y [j+3] = alpha * X[j+3] + Y[j+3] ;
     }
 
   return ;
 }
-
-
-
-void mncblas_daxpy (const int N, const double alpha, const double *X,
-       const int incX, double *Y, const int incY)
-{
-  /*
-    scalar version with unrolled loop
-  */
-  
-  register unsigned int i ;
-  register unsigned int j ;
-
-  for (i = 0, j = 0 ; j < N; i += 4, j += 4)
-    {
-      Y [j] = alpha * X[i] + Y[j] ; 
-      Y [j+1] = alpha * X[i+1] + Y[j+1] ;
-      Y [j+2] = alpha * X[i+2] + Y[j+2] ;
-      Y [j+3] = alpha * X[i+3] + Y[j+3] ;   
-    }
-
-  return ;
-}
-
 
 void mncblas_daxpy_vec(const int N, const double alpha, const double *X,
        const int incX, double *Y, const int incY)
@@ -131,15 +103,15 @@ void mncblas_daxpy_vec(const int N, const double alpha, const double *X,
   register unsigned int j ;
 
   double2 alpha2 ;
-  
+
   __m128d x1, x2, y1, y2 ;
   __m128d alpha1;
 
   alpha2 [0] = alpha;
   alpha2 [1] = alpha;
-  
-  alpha1 = _mm_load_pd (alpha2) ;  
-  
+
+  alpha1 = _mm_load_pd (alpha2) ;
+
   for (i = 0, j = 0 ; j < N; i += 2, j += 2)
     {
       x1 = _mm_load_pd (X+i) ;
@@ -157,17 +129,36 @@ void mncblas_daxpy_omp (const int N, const double alpha, const double *X,
   /*
     scalar version with unrolled loop
   */
-  
-  register unsigned int i ;
+
   register unsigned int j ;
 
-  #pragma omp for schedule(static) private(i, j)
-  for (i = 0, j = 0 ; j < N; i += 4, j += 4)
+  #pragma omp for schedule(static)
+  for (j = 0 ; j < N; j += 4)
     {
-      Y [j] = alpha * X[i] + Y[j] ; 
-      Y [j+1] = alpha * X[i+1] + Y[j+1] ;
-      Y [j+2] = alpha * X[i+2] + Y[j+2] ;
-      Y [j+3] = alpha * X[i+3] + Y[j+3] ;   
+      Y [j] = alpha * X[j] + Y[j] ; 
+      Y [j+1] = alpha * X[j+1] + Y[j+1] ;
+      Y [j+2] = alpha * X[j+2] + Y[j+2] ;
+      Y [j+3] = alpha * X[j+3] + Y[j+3] ;   
+    }
+
+  return ;
+}
+
+void mncblas_daxpy (const int N, const double alpha, const double *X,
+       const int incX, double *Y, const int incY)
+{
+  /*
+    scalar version with unrolled loop
+  */
+
+  register unsigned int j ;
+
+  for (j = 0 ; j < N; j += 4)
+    {
+      Y [j] = alpha * X[j] + Y[j] ;
+      Y [j+1] = alpha * X[j+1] + Y[j+1] ;
+      Y [j+2] = alpha * X[j+2] + Y[j+2] ;
+      Y [j+3] = alpha * X[j+3] + Y[j+3] ;
     }
 
   return ;
@@ -192,6 +183,50 @@ void mncblas_caxpy(const int N, const void *alpha, const void *X,
       *(YP+j+1) = temp.IMAG + *(YP+j+1);
     }
 
+  return ;
+}
+
+void mncblas_caxpy_vec(const int N, const void *alpha, const void *X,
+           const int incX, void *Y, const int incY)
+{
+  register unsigned int i = 0 ;
+  register unsigned int j = 0 ;
+  float *XP = (float *) X;
+  float *YP = (float *) Y;
+  float *AP = (float *) alpha;
+  register float reel;
+  register float imag;
+  vcomplexe temp;
+
+  float4 alpha4 ;
+
+  __m128 x1, x2, x3, y1, y2, res;
+  __m128 alpha1;
+  __m128 alpha2;
+
+  for(int i = 0; i < 4; i++){
+    alpha4 [i] = AP[0];
+  }
+
+  alpha1 = _mm_load_ps(alpha4) ;
+
+  for(int i = 0; i < 4; i++){
+    alpha4 [i] = AP[1];
+  }
+
+  alpha2 = _mm_load_ps(alpha4);
+
+  for (; (i < N) ; i += incX + 4){
+    x1 = _mm_load_ps(XP+i);
+    x2 = _mm_mul_ps(x1, alpha1);
+    x3 = _mm_mul_ps(x1, alpha2);
+
+    res = _mm_addsub_ps(x2, x3);
+
+    y1 = _mm_load_ps(YP+i);
+    y2 = _mm_add_ps(y1, res);
+    _mm_store_ps (YP+i, y2) ;
+  }
   return ;
 }
 
@@ -262,6 +297,10 @@ void mncblas_zaxpy_vec(const int N, const void *alpha, const void *X,
     }
 }
 
+// void mncblas_saxpy_omp (const int N, const float alpha, const float *X,
+//            const int incX, float *Y, const int incY)
+// {
+
 /* FOR TEST PURPOSES */
 void printvec(double v[], int size){
   for(int i = 0 ; i<size; i++)
@@ -280,16 +319,43 @@ void printvec2(VCOMP v){
 }
 
 int main(){
-  VCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
-  VCOMP V2 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
+  // VCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
+  // VCOMP V2 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
 
-  vcomplexe a = {1.0, 2.0};
-  vcomplexe *p1 = &a;
+  // vcomplexe a = {1.0, 2.0};
+  // vcomplexe *p1 = &a;
+
+  // //printvec2(V1);
+  // //printvec2(V2);
+  // //mncblas_caxpy (5, p1, V1, 1, V2, 1);
+  // //printf("NON VECTORISE : \n");
+  // //printvec2(V2);
+
+  // printf("VECTORISE : \n");
+  // mncblas_caxpy (5, p1, V1, 0, V2, 0);
+
+  // printvec2(V2);
+
+  double V1 [4] = {1.0, 1.0, 1.0, 1.0};
+  double V2 [4] = {1.0, 1.0, 1.0, 1.0};
+  double V3 [4] = {1.0, 1.0, 1.0, 1.0};
+
+  double a = 2.0;
+  double *p1 = &a;
 
   //printvec2(V1);
   //printvec2(V2);
-  mncblas_caxpy (5, p1, V1, 1, V2, 1);
-  printvec2(V2);
+  //mncblas_caxpy (5, p1, V1, 1, V2, 1);
+  //printf("NON VECTORISE : \n");
+  //printvec2(V2);
+
+  printf("VECTORISE : \n");
+  mncblas_daxpy_omp (4, a, V1, 0, V2, 0);
+  mncblas_daxpy (4, a, V1, 1, V3, 1);
+
+  printvec(V2, 4);
+  printvec(V3, 4);
+
 }
 
 
