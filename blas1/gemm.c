@@ -35,6 +35,168 @@ void print_(double *m){
 		printf("%f ", *(m+i));
 }
 
+void mncblas_sgemm (
+              MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
+              MNCBLAS_TRANSPOSE TransB, const int M, const int N,
+              const int K, const float alpha, const float *A,
+              const int lda, const float *B, const int ldb,
+              const float beta, float *C, const int ldc
+              )
+{
+  /*
+     scalar implementation
+  */
+  register unsigned int i ;
+  register unsigned int j ;
+  register unsigned int k ;
+  register float r ;
+
+
+  for (i = 0 ; i < M; i = i + 4)
+    {
+      /* i */
+      for (j = 0 ; j < M; j ++)
+    {
+      r = 0.0 ;
+      for (k = 0; k < M; k=k+4)
+        {
+          r = r + A [(i * M) + k    ] * B [(k * M)       + j] ;
+          r = r + A [(i * M) + k + 1] * B [(k + 1) * M   + j] ;
+          r = r + A [(i * M) + k + 2] * B [(k + 2) * M   + j] ;
+          r = r + A [(i * M) + k + 3] * B [(k + 3) * M   + j] ;
+        }
+      C [(i*M) + j] = (alpha * r) + (beta * C [(i*M) + j]) ;
+
+      //printf("\n-> %f\n", r);
+    }
+
+      /* i + 1 */
+      for (j = 0 ; j < M; j ++)
+    {
+      r = 0.0 ;
+      for (k = 0; k < M; k=k+4)
+        {
+          r = r + A [((i + 1) * M) + k    ] * B [(k * M)     + j] ;
+          r = r + A [((i + 1) * M) + k + 1] * B [(k + 1) * M + j] ;
+          r = r + A [((i + 1) * M) + k + 2] * B [(k + 2) * M + j] ;
+          r = r + A [((i + 1) * M) + k + 3] * B [(k + 3) * M + j] ;
+        }
+      C [((i + 1) * M) + j] = (alpha * r) + (beta * C [((i + 1) * M) + j]) ;
+    }
+
+       /* i + 2 */
+      for (j = 0 ; j < M; j ++)
+    {
+      r = 0.0 ;
+      for (k = 0; k < M; k = k + 4)
+        {
+          r = r + A [((i + 2) * M) + k    ] * B [(k * M)     + j] ;
+          r = r + A [((i + 2) * M) + k + 1] * B [(k + 1) * M + j] ;
+          r = r + A [((i + 2) * M) + k + 2] * B [(k + 2) * M + j] ;
+          r = r + A [((i + 2) * M) + k + 3] * B [(k + 3) * M + j] ;
+        }
+      C [((i + 2) * M) + j] = (alpha * r) + (beta * C [((i + 2) * M) + j]) ;
+    }
+
+      /* i + 3 */
+      for (j = 0 ; j < M; j ++)
+    {
+      r = 0.0 ;
+      for (k = 0; k < M; k = k + 4)
+        {
+          r = r + A [((i + 3) * M) + k    ] * B [(k * M)     + j] ;
+          r = r + A [((i + 3) * M) + k + 1] * B [(k + 1) * M + j] ;
+          r = r + A [((i + 3) * M) + k + 2] * B [(k + 2) * M + j] ;
+          r = r + A [((i + 3) * M) + k + 3] * B [(k + 3) * M + j] ;
+        }
+      C [((i + 3) * M) + j] = (alpha * r) + (beta * C [((i + 3) * M) + j]) ;
+    }
+
+    }
+  return ;
+}
+
+void mncblas_sgemm_omp (
+              MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
+              MNCBLAS_TRANSPOSE TransB, const int M, const int N,
+              const int K, const float alpha, const float *A,
+              const int lda, const float *B, const int ldb,
+              const float beta, float *C, const int ldc
+              )
+{
+  /*
+     scalar implementation
+  */
+  register unsigned int i ;
+  register unsigned int j ;
+  register unsigned int k ;
+  register float r ;
+
+  #pragma omp parallel for schedule(static) private(i, j, k)
+  for (i = 0 ; i < M; i = i + 4)
+    {
+      /* i */
+      for (j = 0 ; j < M; j ++)
+    {
+      r = 0.0 ;
+      for (k = 0; k < M; k=k+4)
+        {
+          r = r + A [(i * M) + k    ] * B [(k * M)       + j] ;
+          r = r + A [(i * M) + k + 1] * B [(k + 1) * M   + j] ;
+          r = r + A [(i * M) + k + 2] * B [(k + 2) * M   + j] ;
+          r = r + A [(i * M) + k + 3] * B [(k + 3) * M   + j] ;
+        }
+      C [(i*M) + j] = (alpha * r) + (beta * C [(i*M) + j]) ;
+
+      //printf("\n-> %f\n", r);
+    }
+
+      /* i + 1 */
+      for (j = 0 ; j < M; j ++)
+    {
+      r = 0.0 ;
+      for (k = 0; k < M; k=k+4)
+        {
+          r = r + A [((i + 1) * M) + k    ] * B [(k * M)     + j] ;
+          r = r + A [((i + 1) * M) + k + 1] * B [(k + 1) * M + j] ;
+          r = r + A [((i + 1) * M) + k + 2] * B [(k + 2) * M + j] ;
+          r = r + A [((i + 1) * M) + k + 3] * B [(k + 3) * M + j] ;
+        }
+      C [((i + 1) * M) + j] = (alpha * r) + (beta * C [((i + 1) * M) + j]) ;
+    }
+
+       /* i + 2 */
+      for (j = 0 ; j < M; j ++)
+    {
+      r = 0.0 ;
+      for (k = 0; k < M; k = k + 4)
+        {
+          r = r + A [((i + 2) * M) + k    ] * B [(k * M)     + j] ;
+          r = r + A [((i + 2) * M) + k + 1] * B [(k + 1) * M + j] ;
+          r = r + A [((i + 2) * M) + k + 2] * B [(k + 2) * M + j] ;
+          r = r + A [((i + 2) * M) + k + 3] * B [(k + 3) * M + j] ;
+        }
+      C [((i + 2) * M) + j] = (alpha * r) + (beta * C [((i + 2) * M) + j]) ;
+    }
+
+      /* i + 3 */
+      for (j = 0 ; j < M; j ++)
+    {
+      r = 0.0 ;
+      for (k = 0; k < M; k = k + 4)
+        {
+          r = r + A [((i + 3) * M) + k    ] * B [(k * M)     + j] ;
+          r = r + A [((i + 3) * M) + k + 1] * B [(k + 1) * M + j] ;
+          r = r + A [((i + 3) * M) + k + 2] * B [(k + 2) * M + j] ;
+          r = r + A [((i + 3) * M) + k + 3] * B [(k + 3) * M + j] ;
+        }
+      C [((i + 3) * M) + j] = (alpha * r) + (beta * C [((i + 3) * M) + j]) ;
+    }
+
+    }
+  return ;
+}
+
 void mncblas_sgemm_vec (
 		    MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
 		    MNCBLAS_TRANSPOSE TransB, const int M, const int N,
@@ -142,88 +304,6 @@ void mncblas_sgemm_vec (
   return ;
 }
 
-
-void mncblas_sgemm (
-		      MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
-		      MNCBLAS_TRANSPOSE TransB, const int M, const int N,
-		      const int K, const float alpha, const float *A,
-		      const int lda, const float *B, const int ldb,
-		      const float beta, float *C, const int ldc
-		      )
-{
-  /* 
-     scalar implementation
-  */
-  register unsigned int i ;
-  register unsigned int j ;
-  register unsigned int k ;
-  register float r ;
-
-
-  for (i = 0 ; i < M; i = i + 4)
-    {
-      /* i */
-      for (j = 0 ; j < M; j ++)
-	{
-	  r = 0.0 ;
-	  for (k = 0; k < M; k=k+4)
-	    {
-	      r = r + A [(i * M) + k    ] * B [(k * M)       + j] ;
-	      r = r + A [(i * M) + k + 1] * B [(k + 1) * M   + j] ;
-	      r = r + A [(i * M) + k + 2] * B [(k + 2) * M   + j] ;
-	      r = r + A [(i * M) + k + 3] * B [(k + 3) * M   + j] ;
-	    }
-	  C [(i*M) + j] = (alpha * r) + (beta * C [(i*M) + j]) ;
-
-	  //printf("\n-> %f\n", r);
-	}
-
-      /* i + 1 */
-      for (j = 0 ; j < M; j ++)
-	{
-	  r = 0.0 ;
-	  for (k = 0; k < M; k=k+4)
-	    {
-	      r = r + A [((i + 1) * M) + k    ] * B [(k * M)     + j] ;
-	      r = r + A [((i + 1) * M) + k + 1] * B [(k + 1) * M + j] ;
-	      r = r + A [((i + 1) * M) + k + 2] * B [(k + 2) * M + j] ;
-	      r = r + A [((i + 1) * M) + k + 3] * B [(k + 3) * M + j] ;
-	    }
-	  C [((i + 1) * M) + j] = (alpha * r) + (beta * C [((i + 1) * M) + j]) ;
-	}
-
-       /* i + 2 */
-      for (j = 0 ; j < M; j ++)
-	{
-	  r = 0.0 ;
-	  for (k = 0; k < M; k = k + 4)
-	    {
-	      r = r + A [((i + 2) * M) + k    ] * B [(k * M)     + j] ;
-	      r = r + A [((i + 2) * M) + k + 1] * B [(k + 1) * M + j] ;
-	      r = r + A [((i + 2) * M) + k + 2] * B [(k + 2) * M + j] ;
-	      r = r + A [((i + 2) * M) + k + 3] * B [(k + 3) * M + j] ;
-	    }
-	  C [((i + 2) * M) + j] = (alpha * r) + (beta * C [((i + 2) * M) + j]) ;
-	}
-
-      /* i + 3 */
-      for (j = 0 ; j < M; j ++)
-	{
-	  r = 0.0 ;
-	  for (k = 0; k < M; k = k + 4)
-	    {
-	      r = r + A [((i + 3) * M) + k    ] * B [(k * M)     + j] ;
-	      r = r + A [((i + 3) * M) + k + 1] * B [(k + 1) * M + j] ;
-	      r = r + A [((i + 3) * M) + k + 2] * B [(k + 2) * M + j] ;
-	      r = r + A [((i + 3) * M) + k + 3] * B [(k + 3) * M + j] ;
-	    }
-	  C [((i + 3) * M) + j] = (alpha * r) + (beta * C [((i + 3) * M) + j]) ;
-	}
-
-    }
-  return ;
-}
-
 void mncblas_dgemm (
 		      MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
 		      MNCBLAS_TRANSPOSE TransB, const int M, const int N,
@@ -299,6 +379,87 @@ void mncblas_dgemm (
 	    }
 	  C [((i + 3) * M) + j] = (alpha * r) + (beta * C [((i + 3) * M) + j]) ;
 	}
+
+    }
+  return ;
+}
+
+void mncblas_dgemm_omp (
+              MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
+              MNCBLAS_TRANSPOSE TransB, const int M, const int N,
+              const int K, const double alpha, const double *A,
+              const int lda, const double *B, const int ldb,
+              const double beta, double *C, const int ldc
+              )
+{
+  /* 
+     scalar implementation
+  */
+  register unsigned int i ;
+  register unsigned int j ;
+  register unsigned int k ;
+  register double r ;
+
+  #pragma omp parallel for schedule(static) private(i, j, k)
+  for (i = 0 ; i < M; i = i + 4)
+    {
+      /* i */
+      for (j = 0 ; j < M; j ++)
+    {
+      r = 0.0 ;
+      for (k = 0; k < M; k=k+4)
+        {
+          r = r + A [(i * M) + k    ] * B [(k * M)       + j] ;
+          r = r + A [(i * M) + k + 1] * B [(k + 1) * M   + j] ;
+          r = r + A [(i * M) + k + 2] * B [(k + 2) * M   + j] ;
+          r = r + A [(i * M) + k + 3] * B [(k + 3) * M   + j] ;
+        }
+      C [(i*M) + j] = (alpha * r) + (beta * C [(i*M) + j]) ;
+
+      //printf("\n-> %f\n", r);
+    }
+
+      /* i + 1 */
+      for (j = 0 ; j < M; j ++)
+    {
+      r = 0.0 ;
+      for (k = 0; k < M; k=k+4)
+        {
+          r = r + A [((i + 1) * M) + k    ] * B [(k * M)     + j] ;
+          r = r + A [((i + 1) * M) + k + 1] * B [(k + 1) * M + j] ;
+          r = r + A [((i + 1) * M) + k + 2] * B [(k + 2) * M + j] ;
+          r = r + A [((i + 1) * M) + k + 3] * B [(k + 3) * M + j] ;
+        }
+      C [((i + 1) * M) + j] = (alpha * r) + (beta * C [((i + 1) * M) + j]) ;
+    }
+
+       /* i + 2 */
+      for (j = 0 ; j < M; j ++)
+    {
+      r = 0.0 ;
+      for (k = 0; k < M; k = k + 4)
+        {
+          r = r + A [((i + 2) * M) + k    ] * B [(k * M)     + j] ;
+          r = r + A [((i + 2) * M) + k + 1] * B [(k + 1) * M + j] ;
+          r = r + A [((i + 2) * M) + k + 2] * B [(k + 2) * M + j] ;
+          r = r + A [((i + 2) * M) + k + 3] * B [(k + 3) * M + j] ;
+        }
+      C [((i + 2) * M) + j] = (alpha * r) + (beta * C [((i + 2) * M) + j]) ;
+    }
+
+      /* i + 3 */
+      for (j = 0 ; j < M; j ++)
+    {
+      r = 0.0 ;
+      for (k = 0; k < M; k = k + 4)
+        {
+          r = r + A [((i + 3) * M) + k    ] * B [(k * M)     + j] ;
+          r = r + A [((i + 3) * M) + k + 1] * B [(k + 1) * M + j] ;
+          r = r + A [((i + 3) * M) + k + 2] * B [(k + 2) * M + j] ;
+          r = r + A [((i + 3) * M) + k + 3] * B [(k + 3) * M + j] ;
+        }
+      C [((i + 3) * M) + j] = (alpha * r) + (beta * C [((i + 3) * M) + j]) ;
+    }
 
     }
   return ;
@@ -461,7 +622,7 @@ int main(){
 	// float alpha = 1;
 	// float beta = 1;
 
-	// mncblas_sgemm (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
+	// mncblas_sgemm_omp (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
 	// print_matrix(C1, 4);
 
 	// matrix C2 = {
@@ -476,8 +637,8 @@ int main(){
 	double alpha = 1;
 	double beta = 1;
 
-	//mncblas_dgemm_vec (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
-	mncblas_dgemm_vec(101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
+	mncblas_dgemm_omp (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
+	// mncblas_dgemm_vec(101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
 
 	print_matrix(C1, 4);
 
