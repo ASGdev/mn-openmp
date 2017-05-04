@@ -34,12 +34,26 @@ float mncblas_sdot(const int N, const float *X, const int incX,
                  const float *Y, const int incY)
 {
   register unsigned int i = 0 ;
-  register unsigned int j = 0 ;
   register float dot = 0.0 ;
 
-  for (; ((i < N) && (j < N)) ; i += incX, j+=incY)
+  for (; i < N ; i += incX)
     {
-      dot = dot + X [i] * Y [j] ;
+      dot = dot + X [i] * Y [i] ;
+    }
+
+  return dot ;
+}
+
+float mncblas_sdot_omp(const int N, const float *X, const int incX, 
+                 const float *Y, const int incY)
+{
+  register unsigned int i = 0 ;
+  register float dot = 0.0 ;
+
+  #pragma omp parallel for schedule(static) private(i) reduction(+:dot) 
+  for (i = 0; i < N ; i += incX)
+    {
+      dot = dot + X [i] * Y [i] ;
     }
 
   return dot ;
@@ -64,33 +78,15 @@ float mncblas_sdot_vec(const int N, const float *X, const int incX,
   return (fdot[0] + fdot[1] + fdot[2] + fdot[3]) ;
 }
 
-
-float mncblas_sdot_omp(const int N, const float *X, const int incX, 
-                 const float *Y, const int incY)
-{
-  register unsigned int i = 0 ;
-  register unsigned int j = 0 ;
-  register float dot = 0.0 ;
-  
-  #pragma omp parallel for schedule(static) reduction(+:dot) private(i, j)
-  for (; ((i < N) && (j < N)) ; i += incX, j+=incY)
-    {
-      dot = dot + X [i] * Y [j] ;
-    }
-
-  return dot ;
-}
-
 double mncblas_ddot(const int N, const double *X, const int incX, 
                  const double *Y, const int incY)
 {
   register unsigned int i = 0 ;
-  register unsigned int j = 0 ;
   register double dot = 0.0 ;
 
-  for (; ((i < N) && (j < N)) ; i += incX, j+=incY)
+  for (; i < N ; i += incX)
     {
-      dot = dot + X [i] * Y [j] ;
+      dot = dot + X [i] * Y [i] ;
     }
 
   return dot ;
@@ -100,13 +96,12 @@ double mncblas_ddot_omp(const int N, const double *X, const int incX,
                  const double *Y, const int incY)
 {
   register unsigned int i = 0 ;
-  register unsigned int j = 0 ;
   register double dot = 0.0 ;
 
-  #pragma omp parallel for schedule(static) reduction(+:dot) private(i, j)
-  for (; ((i < N) && (j < N)) ; i += incX, j+=incY)
+  #pragma omp parallel for schedule(static) reduction(+:dot) private(i)
+  for (i=0 ; i < N ; i += incX)
     {
-      dot = dot + X [i] * Y [j] ;
+      dot = dot + X [i] * Y [i] ;
     }
 
   return dot ;
@@ -214,14 +209,22 @@ void   mncblas_zdotc_sub(const int N, const void *X, const int incX,
 
 
 int main(){
-  vcomplexe v1[5] = {{1.0, 2.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
-  vcomplexe v2[5] = {{1.0, 2.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
-  //float v2[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
+  // vcomplexe v1[5] = {{1.0, 2.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
+  // vcomplexe v2[5] = {{1.0, 2.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
+  double v1[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
+  double v2[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
   vcomplexe r;
 
-  // printf("Dot d seq : %f\n", mncblas_ddot(5, v1, 1, v2, 1));
-  // printf("Dot d p : %f\n", mncblas_ddot_omp(5, v1, 1, v2, 1));
-  // printf("Dot d vec : %f\n", mncblas_ddot_vec(5, v1, 0, v2, 0));
-  mncblas_cdotu_sub(5, v1, 0, v2, 0, &r);
-  
+  printf("Dot d seq : %f\n", mncblas_ddot(5, v1, 1, v2, 1));
+  printf("Dot d p : %f\n", mncblas_ddot_omp(5, v1, 1, v2, 1));
+  printf("Dot d vec : %f\n", mncblas_ddot_vec(5, v1, 0, v2, 0));
+
+  float v3[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
+  float v4[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
+
+  printf("Dot s seq : %f\n", mncblas_sdot(5, v3, 1, v4, 1));
+  printf("Dot s p : %f\n", mncblas_sdot_omp(5, v3, 1, v4, 1));
+  printf("Dot s vec : %f\n", mncblas_sdot_vec(5, v3, 0, v4, 0));
+  // mncblas_cdotu_sub(5, v1, 0, v2, 0, &r);
+
 }

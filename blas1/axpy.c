@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <x86intrin.h>
 
-#define VEC_SIZE 5
+#define VEC_SIZE 4
 
 typedef struct {
   float REEL;
@@ -186,6 +186,28 @@ void mncblas_caxpy(const int N, const void *alpha, const void *X,
   return ;
 }
 
+void mncblas_caxpy_omp(const int N, const void *alpha, const void *X,
+       const int incX, void *Y, const int incY)
+{
+  register unsigned int i = 0 ;
+  float *XP = (float *) X;
+  float *YP = (float *) Y;
+  float *AP = (float *) alpha;
+  register float reel;
+  register float imag;
+  vcomplexe temp;
+
+  #pragma omp for schedule(static) private(i)
+  for (i=0 ; i < N*2 ; i += incX +1 ){
+    temp.REEL = (AP[0] * *(XP+i)) - (AP[1] * *(XP+i+1));
+    temp.IMAG = (AP[0] * *(XP+i+1)) + (AP[1] * *(XP+i));
+    *(YP+i) = temp.REEL + YP[i];
+    *(YP+i+1) = temp.IMAG + *(YP+i+1);
+  }
+
+  return ;
+}
+
 void mncblas_caxpy_vec(const int N, const void *alpha, const void *X,
            const int incX, void *Y, const int incY)
 {
@@ -234,7 +256,6 @@ void mncblas_zaxpy(const int N, const void *alpha, const void *X,
        const int incX, void *Y, const int incY)
 {
     register unsigned int i = 0 ;
-    register unsigned int j = 0 ;
     double *XP = (double *) X;
     double *YP = (double *) Y;
     double *AP = (double *) alpha;
@@ -242,37 +263,32 @@ void mncblas_zaxpy(const int N, const void *alpha, const void *X,
     register double imag;
     dcomplexe temp;
 
-    for (; ((i < N*2) && (j < N*2)) ; i += incX +1 , j+=incY +1){
+    for (; i < N*2 ; i += incX +1){
       temp.REEL = (AP[0] * *(XP+i)) - (AP[1] * *(XP+i+1));
       temp.IMAG = (AP[0] * *(XP+i+1)) + (AP[1] * *(XP+i));
-      *(YP+j) = temp.REEL + YP[j];
-      *(YP+j+1) = temp.IMAG + *(YP+j+1);
+      *(YP+i) = temp.REEL + YP[i];
+      *(YP+i+1) = temp.IMAG + *(YP+i+1);
     }
 }
 
 void mncblas_zaxpy_omp(const int N, const void *alpha, const void *X,
 		   const int incX, void *Y, const int incY)
 {
-    // register unsigned int i = 0 ;
-    // register unsigned int j = 0 ;
-    // double *XP = (double *) X;
-    // double *YP = (double *) Y;
-    // float *AP = (float *) A;
-    // register double reel;
-    // register double imag;
+  register unsigned int i = 0 ;
+  double *XP = (double *) X;
+  double *YP = (double *) Y;
+  double *AP = (double *) alpha;
+  register double reel;
+  register double imag;
+  dcomplexe temp;
 
-    // #pragma omp for
-    // for (; ((i < N) && (j < N)) ; i += incX, j+=incY){
-    //     if((i+j)%2==0){
-    //         if(i%2==1)
-    //             reel = reel + (AP[0] * XP[i] + YP[j]);
-    //         else
-    //             reel = reel - (AP[0] * XP[i] + YP[j]);
-    //         }
-    //     else{
-    //       imag = imag + (AP[1] * XP[i] + YP[j]);
-    //     }
-    // }
+  #pragma omp for schedule(static) private(i)
+  for (i=0 ; i < N*2 ; i += incX +1){
+    temp.REEL = (AP[0] * *(XP+i)) - (AP[1] * *(XP+i+1));
+    temp.IMAG = (AP[0] * *(XP+i+1)) + (AP[1] * *(XP+i));
+    *(YP+i) = temp.REEL + YP[i];
+    *(YP+i+1) = temp.IMAG + *(YP+i+1);
+  }
 
   return ;
 }
@@ -318,30 +334,21 @@ void printvec2(VCOMP v){
   printf("\n");
 }
 
+void printvec3(DCOMP v){
+  for(int i = 0 ; i< VEC_SIZE; i++){
+    dcomplexe cc = v[i];
+    printf("(%f, %f) ", cc.REEL, cc.IMAG);
+  }
+
+  printf("\n");
+}
+
 int main(){
-  // VCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
-  // VCOMP V2 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
+  // VCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
+  // VCOMP V2 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
 
   // vcomplexe a = {1.0, 2.0};
   // vcomplexe *p1 = &a;
-
-  // //printvec2(V1);
-  // //printvec2(V2);
-  // //mncblas_caxpy (5, p1, V1, 1, V2, 1);
-  // //printf("NON VECTORISE : \n");
-  // //printvec2(V2);
-
-  // printf("VECTORISE : \n");
-  // mncblas_caxpy (5, p1, V1, 0, V2, 0);
-
-  // printvec2(V2);
-
-  double V1 [4] = {1.0, 1.0, 1.0, 1.0};
-  double V2 [4] = {1.0, 1.0, 1.0, 1.0};
-  double V3 [4] = {1.0, 1.0, 1.0, 1.0};
-
-  double a = 2.0;
-  double *p1 = &a;
 
   //printvec2(V1);
   //printvec2(V2);
@@ -349,12 +356,41 @@ int main(){
   //printf("NON VECTORISE : \n");
   //printvec2(V2);
 
-  printf("VECTORISE : \n");
-  mncblas_daxpy_omp (4, a, V1, 0, V2, 0);
-  mncblas_daxpy (4, a, V1, 1, V3, 1);
 
-  printvec(V2, 4);
-  printvec(V3, 4);
+
+  //  TEST SIMPLE COMPLEX OMP
+  // mncblas_caxpy (4, p1, V1, 0, V2, 0);
+  // mncblas_caxpy_omp (4, p1, V1, 0, V2, 0);
+  // printvec2(V2);
+
+
+
+  //  TEST DOUBLE COMPLEX OMP
+  DCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
+  DCOMP V2 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
+
+  dcomplexe a = {1.0, 2.0};
+  dcomplexe *p1 = &a;
+
+  // mncblas_zaxpy (4, p1, V1, 0, V2, 0);
+  mncblas_zaxpy_omp (4, p1, V1, 0, V2, 0);
+  printvec3(V2);
+
+
+
+  // TEST DOUBLE
+  // double V1 [4] = {1.0, 1.0, 1.0, 1.0};
+  // double V2 [4] = {1.0, 1.0, 1.0, 1.0};
+  // double V3 [4] = {1.0, 1.0, 1.0, 1.0};
+
+  // double a = 2.0;
+  // double *p1 = &a;
+
+  // mncblas_daxpy_omp (4, a, V1, 0, V2, 0);
+  // mncblas_daxpy (4, a, V1, 1, V3, 1);
+
+  // printvec(V2, 4);
+  // printvec(V3, 4);
 
 }
 
