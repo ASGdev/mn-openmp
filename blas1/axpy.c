@@ -62,7 +62,7 @@ void mncblas_saxpy_omp (const int N, const float alpha, const float *X,
   */
   register unsigned int j ;
 
-  #pragma omp for schedule(static)
+  #pragma omp for schedule(static) private(j)
   for (j = 0 ; j < N;j += 4)
     {
       Y [j] = alpha * X[j] + Y[j] ;
@@ -132,7 +132,7 @@ void mncblas_daxpy_omp (const int N, const double alpha, const double *X,
 
   register unsigned int j ;
 
-  #pragma omp for schedule(static)
+  #pragma omp for schedule(static) private(j)
   for (j = 0 ; j < N; j += 4)
     {
       Y [j] = alpha * X[j] + Y[j] ; 
