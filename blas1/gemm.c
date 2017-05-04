@@ -7,8 +7,31 @@
 
 
 typedef float *floatM;
+typedef double *doubleM;
 typedef double matrix [4][4] ;
 typedef float float4 [4]  __attribute__ ((aligned (16))) ;
+typedef double double2 [2] __attribute__ ((aligned (16))) ;
+
+void print_matrix (matrix M, int N)
+{
+  register unsigned int i, j ;
+
+  for (i = 0 ; i < N; i++)
+    {
+      for (j = 0 ; j < N; j++)
+	{
+	  printf (" %3.2f ", M[i][j]) ;
+	}
+      printf ("\n") ;
+    }
+  printf ("\n") ;
+  return ;
+}
+
+void print_(float *m){
+	for(int i = 0; i< 16; i++)
+		printf("%f ", *(m+i));
+}
 
 void mncblas_sgemm_vec (
 		    MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
@@ -129,11 +152,13 @@ void mncblas_sgemm (
   /* 
      scalar implementation
   */
-  
   register unsigned int i ;
   register unsigned int j ;
   register unsigned int k ;
   register float r ;
+
+   print_(C);
+	  printf("\n");
 
   for (i = 0 ; i < M; i = i + 4)
     {
@@ -149,6 +174,8 @@ void mncblas_sgemm (
 	      r = r + A [(i * M) + k + 3] * B [(k + 3) * M   + j] ;
 	    }
 	  C [(i*M) + j] = (alpha * r) + (beta * C [(i*M) + j]) ;
+
+	  //printf("\n-> %f\n", r);
 	}
 
       /* i + 1 */
@@ -198,13 +225,109 @@ void mncblas_sgemm (
 }
 
 
-void mncblas_dgemm(MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
+void mncblas_dgemm_vec(MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
 		   MNCBLAS_TRANSPOSE TransB, const int M, const int N,
 		   const int K, const double alpha, const double *A,
 		   const int lda, const double *B, const int ldb,
 		   const double beta, double *C, const int ldc)
 {
 
+  /*
+    vectorized implementation
+  */
+  
+  register unsigned int i ;
+  register unsigned int j ;
+  register unsigned int k ;
+  register unsigned int l ;
+
+  register unsigned int indice_ligne ;
+  
+  register float r ;
+  doubleM   Bcol ;
+  double2   R4 ;
+  int      err ;
+  
+  __m128d av4 ;
+  __m128d bv4 ;
+  __m128d dot ;
+
+  /*
+    Bcol = (floatM) malloc (M * sizeof (float)) ;
+    err = posix_memalign ((void **) &Bcol, 16, M*sizeof(float)) ;
+  */
+
+  if (TransB == MNCblasNoTrans)
+    {
+      Bcol = aligned_alloc (16, M * sizeof (double)) ;
+  
+      for (i = 0 ; i < M; i = i + 1)
+	{
+	  
+	  for (j = 0 ; j < M; j ++)
+	    {
+	      
+
+	      /*
+		load a B column (j)
+	      */
+
+	      for (l = 0 ; l < M*2 ; l = l + 4)
+		{
+		  Bcol [l]     = B [l        * M + j ] ;
+		  Bcol [l + 1] = B [(l + 1)  * M + j ] ;
+		  Bcol [l + 2] = B [(l + 2)  * M + j ] ;
+		  Bcol [l + 3] = B [(l + 3)  * M + j ] ;	      
+		}
+
+	      r = 0.0 ;	  
+	      indice_ligne = i * M ;
+	  
+	      for (k = 0; k < M; k = k + 2)
+		{
+
+		  av4 = _mm_load_pd (A+indice_ligne + k);
+		  bv4 = _mm_load_pd (Bcol+ k) ;
+		  
+		  dot = _mm_dp_pd (av4, bv4, 0xFF) ;
+	      
+		  _mm_store_pd (R4, dot) ;
+
+		  r = r + R4 [0] ;
+		}
+	  
+	      C [indice_ligne + j] = (alpha * r) + (beta * C [indice_ligne + j]) ;
+	    }
+	}
+    }
+  else
+    {
+      for (i = 0 ; i < M; i = i + 1)
+	{
+	  
+	  for (j = 0 ; j < M; j ++)
+	    {
+	      
+	      r = 0.0 ;	  
+	      indice_ligne = i * M ;
+	  
+	      for (k = 0; k < M; k = k + 4)
+		{
+
+		  av4 = _mm_load_pd (A + indice_ligne + k);
+		  bv4 = _mm_load_pd (B + indice_ligne + k) ;
+		  
+		  dot = _mm_dp_pd (av4, bv4, 0xFF) ;
+	      
+		  _mm_store_pd (R4, dot) ;
+
+		  r = r + R4 [0] ;
+		}
+	  
+	      C [indice_ligne + j] = (alpha * r) + (beta * C [indice_ligne + j]) ;
+	    }
+	}
+    }
   return ;
 }
 
@@ -234,30 +357,48 @@ void mncblas_zgemm (
 }
 
 
-void print_matrix (matrix M)
-{
-  register unsigned int i, j ;
 
-  for (i = 0 ; i < N; i++)
-    {
-      for (j = 0 ; j < N; j++)
-	{
-	  printf (" %3.2f ", M[i][j]) ;
-	}
-      printf ("\n") ;
-    }
-  printf ("\n") ;
-  return ;
-}
 
 int main(){
-	matrix M = {
+	matrix A = {
 	    {1, 1, 1, 1},
 	    {1, 1, 1, 1},
 	    {1, 1, 1, 1},
 	    {1, 1, 1, 1}
   	};
-	double *pm = &M;
+  	matrix B = {
+	    {2, 2, 2, 2},
+	    {2, 2, 2, 2},
+	    {2, 2, 2, 2},
+	    {2, 2, 2, 2}
+  	};
+  	matrix C1 = {
+	    {2, 2, 2, 2},
+	    {2, 2, 2, 2},
+	    {2, 2, 2, 2},
+	    {2, 2, 2, 2}
+  	};
+
+	// float alpha = 1;
+	// float beta = 1;
+
+	// mncblas_sgemm (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
+	// print_matrix(C1, 4);
+
+	// matrix C2 = {
+	//     {2, 2, 2, 2},
+	//     {2, 2, 2, 2},
+	//     {2, 2, 2, 2},
+	//     {2, 2, 2, 2}
+ //  	};
+ //  	mncblas_sgemm_vec (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C2, 1);
+	// print_matrix(C2, 4);
+
+	double alpha = 1;
+	double beta = 1;
+
+	mncblas_dgemm_vec (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
+	print_matrix(C1, 4);
 
 	return 0;
 }

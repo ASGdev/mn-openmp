@@ -4,6 +4,22 @@
 #include <stdio.h>
 
 #define XMM_NUMBER 8
+#define VEC_SIZE 5
+
+typedef struct {
+  float REEL;
+  float IMAG;
+}vcomplexe;
+
+typedef vcomplexe VCOMP [VEC_SIZE] ;
+
+typedef struct {
+  double REEL;
+  double IMAG;
+}dcomplexe;
+
+typedef dcomplexe DCOMP [VEC_SIZE] ;
+
 typedef float float4 [4] __attribute__ ((aligned (16))) ;
 typedef double double2 [2] __attribute__ ((aligned (16))) ;
 
@@ -118,12 +134,31 @@ double mncblas_ddot_vec(const int N, const double *X, const int incX,
 void mncblas_cdotu_sub(const int N, const void *X, const int incX,
                        const void *Y, const int incY, void *dotu)
 {
-  /* a completer */
-  
-  return ;
+  register unsigned int i = 0 ;
+  register unsigned int j = 0 ;
+  float *XP = (float *)X;
+  float *YP = (float *)Y;
+  vcomplexe *temp = (vcomplexe *)dotu;
+  float re, im;
+  temp->REEL = 0;
+  re = im = 0;
+
+  for (; ((i < N*2)) ; i += incX + 2){
+    printf("X = %f\n", *(XP+i));
+    for(; j < N*2; j+=incY + 2){
+      printf("\t%f\n", *(YP+j));
+      re = re + ((*(XP+i) * *(YP+j)) - (*(XP+i+1) * *(YP+j+1)));
+    }
+    j = 0;
+    temp->REEL += re;
+    printf("re = %f\n", re);
+    //im = im + XP[i] * YP[j]; 
+  }
+
+  printf("vcomplexe : %f %f \n", temp->REEL, temp->IMAG);
 }
 
-void   mncblas_cdotc_sub(const int N, const void *X, const int incX,
+void   mncblas_cdotc_sub_vec(const int N, const void *X, const int incX,
                        const void *Y, const int incY, void *dotc)
 {
   /* conj(X)*Y */
@@ -179,13 +214,14 @@ void   mncblas_zdotc_sub(const int N, const void *X, const int incX,
 
 
 int main(){
-  float v1[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
-  float v2[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
-  float v3[5];
+  vcomplexe v1[5] = {{1.0, 2.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
+  vcomplexe v2[5] = {{1.0, 2.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
+  //float v2[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
+  vcomplexe r;
 
   // printf("Dot d seq : %f\n", mncblas_ddot(5, v1, 1, v2, 1));
   // printf("Dot d p : %f\n", mncblas_ddot_omp(5, v1, 1, v2, 1));
   // printf("Dot d vec : %f\n", mncblas_ddot_vec(5, v1, 0, v2, 0));
-  mncblas_cdotc_sub(5, v1, 0, v2, 0, v3);
+  mncblas_cdotu_sub(5, v1, 0, v2, 0, &r);
   
 }

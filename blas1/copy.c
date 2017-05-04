@@ -39,16 +39,15 @@ void mncblas_scopy(const int N, const float *X, const int incX,
 void mncblas_scopy_omp(const int N, const float *X, const int incX, 
 				 float *Y, const int incY)
 {
-  register unsigned int i = 0 ;
   register unsigned int j = 0 ;
 
-  #pragma omp for schedule(static)
-  for (; ((i < N) && (j < N)) ; i = i + incX + 4, j = j + incY + 4)
+  //#pragma omp for schedule(static)
+  for (; (j < N) ; j = j + incY + 4)
 	{
-	  Y [j] = X [i] ;
-	  Y [j+1] = X [i+1] ;
-	  Y [j+2] = X [i+2] ;
-	  Y [j+3] = X [i+3] ;
+	  Y [j] = X [j] ;
+	  Y [j+1] = X [j+1] ;
+	  Y [j+2] = X [j+2] ;
+	  Y [j+3] = X [j+3] ;
 	}
 
   return ;
@@ -88,14 +87,13 @@ void mncblas_dcopy(const int N, const double *X, const int incX,
 void mncblas_dcopy_omp(const int N, const double *X, const int incX, 
 				 double *Y, const int incY)
 {
-  register unsigned int i = 0 ;
-  register unsigned int j = 0 ;
 
-  #pragma omp for schedule(static) private(i, j)
-  for (; ((i < N) && (j < N)) ; i = i + incX + 2, j = j + incY + 2)
+
+  #pragma omp for schedule(static)
+  for (register unsigned int j = 0; j < N ; j = j + incY + 4)
 	{
-	  Y [j] = X [i] ;
-	  Y [j+1] = X [i+1] ;
+	  Y [j] = X [j] ;
+	  Y [j+1] = X [j+1] ;
 	}
   return ;
 }
@@ -205,7 +203,11 @@ void printvec2(VCOMP v){
 }
 
 int main(){
-  //double v1[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
+  double v1[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
+  double v2[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
+
+  mncblas_dcopy_omp(5, v1, 0, v2, 0);
+  printvec(v2, 5);
 
   // double v2[5];
   // printvec(v2, 5);
@@ -223,13 +225,13 @@ int main(){
   // mncblas_dcopy_omp(5, v1, 0, v4, 0);
   // printvec(v4, 5);
 
-  VCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 8.0}};
-  VCOMP V2;
+  // VCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 8.0}};
+  // VCOMP V2;
 
-  printvec2(V1);
+  // printvec2(V1);
   // mncblas_ccopy_vec(5, V1, 0, V2, 0);
-  mncblas_ccopy(5, V1, 0, V2, 0);
-  printvec2(V2);
+  // mncblas_ccopy(5, V1, 0, V2, 0);
+  // printvec2(V2);
 
   // DCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {5.0, 8.0}};
   // DCOMP V2, V3;
