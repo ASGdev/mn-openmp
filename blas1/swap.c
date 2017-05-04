@@ -41,16 +41,15 @@ void mncblas_sswap(const int N, float *X, const int incX,
 void mncblas_sswap_omp(const int N, float *X, const int incX, 
                  float *Y, const int incY)
 {
-  register unsigned int i = 0 ;
-  register unsigned int j = 0 ;
+  //register unsigned int j = 0 ;
   register float save ;
-  
-  #pragma omp for schedule(static) private (i, j)
-  for (; ((i < N) && (j < N)) ; i += incX, j+=incY)
+
+  #pragma omp for schedule(static) private (save)
+  for (register unsigned int j = 0; j<N ; j+=incY)
     {
       save = Y [j] ;
-      Y [j] = X [i] ;
-      X [i] = save ;
+      Y [j] = X [j] ;
+      X [j] = save ;
     }
 
   return ;
@@ -116,7 +115,7 @@ void mncblas_dswap_omp(const int N, double *X, const int incX,
   register unsigned int j = 0 ;
   register double save ;
 
-  #pragma omp for schedule(static) private (i, j)
+  //#pragma omp for schedule(static) private (i, j)
   for (; ((i < N) && (j < N)) ; i += incX, j+=incY)
     {
       save = Y [j] ;
@@ -192,6 +191,27 @@ void mncblas_zswap(const int N, void *X, const int incX,
   return ;
 }
 
+void mncblas_zswap_omp(const int N, void *X, const int incX, 
+                        void *Y, const int incY)
+{
+  register dcomplexe save;
+  double *XP = (double *) X;
+  double *YP = (double *) Y;
+
+
+  for (register unsigned int j = 0; j < N*2;j+=incY + 1)
+    {
+      save.REEL = YP [j];
+      save.IMAG = YP[j+1] ;
+      YP[j] = XP[j];
+      YP[j+1] = XP[j];
+      XP [j] = save.REEL;
+      XP[j+1] = save.IMAG;
+    }
+
+  return ;
+}
+
 void mncblas_zswap_vec(const int N, void *X, const int incX, 
                         void *Y, const int incY)
 {
@@ -231,24 +251,24 @@ void printvec2(DCOMP v){
 }
 
 int main(){
-  // float v1[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
-  // float v2[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
+  double v1[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
+  double v2[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
 
-  // printvec(v1, 5);
-  // printvec(v2, 5);
-  // mncblas_sswap_omp(5, v1, 1, v2, 1);
-  // printvec(v1, 5);
-  // printvec(v2, 5);
+  printvec(v1, 5);
+  printvec(v2, 5);
+  mncblas_sswap_omp(5, v1, 1, v2, 1);
+  printvec(v1, 5);
+  printvec(v2, 5);
 
-  DCOMP V1 = {{1.0, 1.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
-  DCOMP V2 = {{6.0, 6.0}, {7.0, 7.0}, {8.0, 8.0}, {9.0, 9.0}, {10.0, 10.0}};
+  // DCOMP V1 = {{1.0, 1.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
+  // DCOMP V2 = {{6.0, 6.0}, {7.0, 7.0}, {8.0, 8.0}, {9.0, 9.0}, {10.0, 10.0}};
 
-  printvec2(V1);
-  printvec2(V2);
+  // printvec2(V1);
+  // printvec2(V2);
 
-  mncblas_zswap_vec(5, V1, 0, V2, 0);
+  // mncblas_zswap_vec(5, V1, 0, V2, 0);
 
-  printvec2(V1);
-  printvec2(V2);
+  // printvec2(V1);
+  //printvec2(V2);
 
 }

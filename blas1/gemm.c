@@ -8,7 +8,9 @@
 
 typedef float *floatM;
 typedef double *doubleM;
+
 typedef double matrix [4][4] ;
+
 typedef float float4 [4]  __attribute__ ((aligned (16))) ;
 typedef double double2 [2] __attribute__ ((aligned (16))) ;
 
@@ -28,7 +30,7 @@ void print_matrix (matrix M, int N)
   return ;
 }
 
-void print_(float *m){
+void print_(double *m){
 	for(int i = 0; i< 16; i++)
 		printf("%f ", *(m+i));
 }
@@ -157,8 +159,6 @@ void mncblas_sgemm (
   register unsigned int k ;
   register float r ;
 
-   print_(C);
-	  printf("\n");
 
   for (i = 0 ; i < M; i = i + 4)
     {
@@ -224,6 +224,85 @@ void mncblas_sgemm (
   return ;
 }
 
+void mncblas_dgemm (
+		      MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
+		      MNCBLAS_TRANSPOSE TransB, const int M, const int N,
+		      const int K, const double alpha, const double *A,
+		      const int lda, const double *B, const int ldb,
+		      const double beta, double *C, const int ldc
+		      )
+{
+  /* 
+     scalar implementation
+  */
+  register unsigned int i ;
+  register unsigned int j ;
+  register unsigned int k ;
+  register double r ;
+
+  for (i = 0 ; i < M; i = i + 4)
+    {
+      /* i */
+      for (j = 0 ; j < M; j ++)
+	{
+	  r = 0.0 ;
+	  for (k = 0; k < M; k=k+4)
+	    {
+	      r = r + A [(i * M) + k    ] * B [(k * M)       + j] ;
+	      r = r + A [(i * M) + k + 1] * B [(k + 1) * M   + j] ;
+	      r = r + A [(i * M) + k + 2] * B [(k + 2) * M   + j] ;
+	      r = r + A [(i * M) + k + 3] * B [(k + 3) * M   + j] ;
+	    }
+	  C [(i*M) + j] = (alpha * r) + (beta * C [(i*M) + j]) ;
+
+	  //printf("\n-> %f\n", r);
+	}
+
+      /* i + 1 */
+      for (j = 0 ; j < M; j ++)
+	{
+	  r = 0.0 ;
+	  for (k = 0; k < M; k=k+4)
+	    {
+	      r = r + A [((i + 1) * M) + k    ] * B [(k * M)     + j] ;
+	      r = r + A [((i + 1) * M) + k + 1] * B [(k + 1) * M + j] ;
+	      r = r + A [((i + 1) * M) + k + 2] * B [(k + 2) * M + j] ;
+	      r = r + A [((i + 1) * M) + k + 3] * B [(k + 3) * M + j] ;
+	    }
+	  C [((i + 1) * M) + j] = (alpha * r) + (beta * C [((i + 1) * M) + j]) ;
+	}
+
+       /* i + 2 */
+      for (j = 0 ; j < M; j ++)
+	{
+	  r = 0.0 ;
+	  for (k = 0; k < M; k = k + 4)
+	    {
+	      r = r + A [((i + 2) * M) + k    ] * B [(k * M)     + j] ;
+	      r = r + A [((i + 2) * M) + k + 1] * B [(k + 1) * M + j] ;
+	      r = r + A [((i + 2) * M) + k + 2] * B [(k + 2) * M + j] ;
+	      r = r + A [((i + 2) * M) + k + 3] * B [(k + 3) * M + j] ;
+	    }
+	  C [((i + 2) * M) + j] = (alpha * r) + (beta * C [((i + 2) * M) + j]) ;
+	}
+
+      /* i + 3 */
+      for (j = 0 ; j < M; j ++)
+	{
+	  r = 0.0 ;
+	  for (k = 0; k < M; k = k + 4)
+	    {
+	      r = r + A [((i + 3) * M) + k    ] * B [(k * M)     + j] ;
+	      r = r + A [((i + 3) * M) + k + 1] * B [(k + 1) * M + j] ;
+	      r = r + A [((i + 3) * M) + k + 2] * B [(k + 2) * M + j] ;
+	      r = r + A [((i + 3) * M) + k + 3] * B [(k + 3) * M + j] ;
+	    }
+	  C [((i + 3) * M) + j] = (alpha * r) + (beta * C [((i + 3) * M) + j]) ;
+	}
+
+    }
+  return ;
+}
 
 void mncblas_dgemm_vec(MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
 		   MNCBLAS_TRANSPOSE TransB, const int M, const int N,
@@ -397,7 +476,9 @@ int main(){
 	double alpha = 1;
 	double beta = 1;
 
-	mncblas_dgemm_vec (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
+	//mncblas_dgemm_vec (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
+	mncblas_dgemm_vec(101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
+
 	print_matrix(C1, 4);
 
 	return 0;
