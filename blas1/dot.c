@@ -271,14 +271,34 @@ void mncblas_cdotc_sub(const int N, const void *X, const int incX,
   register unsigned int i = 0 ;
   float *XP = (float *)X;
   float *YP = (float *)Y;
-  vcomplexe *temp = (vcomplexe *)dotu;
+  vcomplexe *temp = (vcomplexe *)dotc;
   temp->IMAG = 0;
   temp->REEL = 0;
 
   for (; ((i < N*2)) ; i += incX + 2){
-      temp->REEL = temp->REEL + ((*(XP+i) * *(YP+i)) - (*(XP+i+1) * *(YP+i+1)));
-      temp->IMAG = temp->IMAG + ((*(XP+i) * *(YP+i+1)) + (*(XP+i+1) * *(YP+i)));
+      temp->REEL = temp->REEL + ((*(XP+i) * *(YP+i)) - ((0-*(XP+i+1)) * *(YP+i+1)));
+      temp->IMAG = temp->IMAG + ((*(XP+i) * *(YP+i+1)) + ((0-*(XP+i+1)) * *(YP+i)));
   }
+  return ;
+}
+
+void mncblas_cdotc_sub_omp(const int N, const void *X, const int incX,
+                       const void *Y, const int incY, void *dotc)
+{
+  float *XP = (float *)X;
+  float *YP = (float *)Y;
+  vcomplexe *temp = (vcomplexe *)dotc;
+
+  double re = 0; double im = 0;
+
+  #pragma omp parallel for schedule(static) reduction(+:re, im)
+  for (register unsigned int i = 0 ; i < N*2; i += incX + 2){
+      re = re + ((*(XP+i) * *(YP+i)) - ((0-*(XP+i+1)) * *(YP+i+1)));
+      im = im + ((*(XP+i) * *(YP+i+1)) + ((0-*(XP+i+1)) * *(YP+i)));
+  }
+
+  temp->REEL = re;
+  temp->IMAG = im;
   return ;
 }
 
@@ -292,45 +312,109 @@ void mncblas_cdotc_sub_vec(const int N, const void *X, const int incX,
   float *XP = (float *) X;
   float *YP = (float *) Y;
 
-  float v3[5], reel, imag;
-  float reelContainer[4];
+  vcomplexe *temp = (vcomplexe *)dotc;
 
-  __m128 dot = _mm_set1_ps(0.0);
-  __m128 conj, R;
+  __m128 o1, o2, m, r;
 
-  double2 fdot;
+  float4 fdot;
 
-  for (; ((i < N) && (j < N)) ; i += incX + 4, j+=incY + 4)
+  for (; ((i < N*2) && (j < N*2)) ; i += incX + 2, j+=incY + 2)
     {
-      // conjugé
-      __m128 temp = _mm_load_ps(XP+i);
-      conj = _mm_sub_ps(_mm_set1_ps(0.0), temp);
-      _mm_store_ps(v3+i, conj);
+      o1 = _mm_set_ps((0-*(XP+i+1)), (0-*(XP+i+1)), *(XP+i), *(XP+i));
+      o2 = _mm_set_ps(*(YP+j), *(YP+j+1), *(YP+j+1), *(YP+j));
 
-      //temp
-      R = _mm_mul_ps(conj, _mm_load_ps(Y+i));
+      m = _mm_mul_ps(o1, o2);
 
-      // reel
+      r = _mm_addsub_ps(m, _mm_shuffle_ps(m, m, _MM_SHUFFLE(0, 1, 3, 2)));
 
-    }
-  // vertical sum : _mm_hadd_ps()
-  //printvec(v3, 5);
+      _mm_store_ps(fdot, r);
+      temp->REEL = temp->REEL + fdot[0];
+      temp->IMAG = temp->IMAG + fdot[1];
+  }
+
   return ;
 }
 
 
   
-void   mncblas_zdotc_sub(const int N, const void *X, const int incX,
+void mncblas_zdotc_sub(const int N, const void *X, const int incX,
                        const void *Y, const int incY, void *dotc)
 {
-  /* a completer */
-  
+  double *XP = (double *)X;
+  double *YP = (double *)Y;
+  dcomplexe *temp = (dcomplexe *)dotc;
+  temp->IMAG = 0;
+  temp->REEL = 0;
+
+  for (register unsigned int i = 0; i < N*2; i += incX + 2){
+      register double conj = (0-*(XP+i+1));
+      temp->REEL = temp->REEL + ((*(XP+i) * *(YP+i)) - (conj * *(YP+i+1)));
+      temp->IMAG = temp->IMAG + ((*(XP+i) * *(YP+i+1)) + (conj * *(YP+i)));
+  }
   return ;
 }
 
+void   mncblas_zdotc_sub_omp(const int N, const void *X, const int incX,
+                       const void *Y, const int incY, void *dotc)
+{
+  double *XP = (double *)X;
+  double *YP = (double *)Y;
+  dcomplexe *temp = (dcomplexe *)dotc;
+  register double re = 0;
+  register double im = 0;
+
+  #pragma omp parallel for schedule(static) reduction(+:re, im)
+  for (register unsigned int i = 0; i < N*2; i += incX + 2){
+      register double conj = (0-*(XP+i+1));
+      re = re + ((*(XP+i) * *(YP+i)) - (conj * *(YP+i+1)));
+      im = im + ((*(XP+i) * *(YP+i+1)) + (conj * *(YP+i)));
+  }
+
+  temp->IMAG = im;
+  temp->REEL = re;
+
+  return ;
+}
+
+void mncblas_zdotc_sub_vec(const int N, const void *X, const int incX,
+                       const void *Y, const int incY, void *dotc)
+{
+  /* conj(X)*Y */
+  register unsigned int i = 0 ;
+  register unsigned int j = 0 ;
+
+  double *XP = (double *) X;
+  double *YP = (double *) Y;
+
+  dcomplexe *temp = (dcomplexe *)dotc;
+
+  __m128d o11, o12, o21, o22, m1, m2, r;
+
+  double2 fdot, to11, to12, to21, to22;
+
+  for (; ((i < N*2) && (j < N*2)) ; i += incX + 2, j+=incY + 2)
+    {
+      register double conj = (0-*(XP+i+1));
+      o11 = _mm_set_pd(*(XP+i), *(XP+i));
+      o12 = _mm_set_pd(conj, conj);
+      o22 = _mm_set_pd(*(YP+j), *(YP+i+1));
+      o21 = _mm_set_pd(*(YP+j+1), *(YP+j));
+
+      m1 = _mm_mul_pd(o11, o21);
+      m2 = _mm_mul_pd(o12, o22);
+
+      r = _mm_addsub_pd(m1, m2);
+
+      _mm_store_pd(fdot, r);
+      temp->REEL = temp->REEL + fdot[0];
+      temp->IMAG = temp->IMAG + fdot[1];
+  }
+
+  return ;
+}
+
+
 /* FOR TEST PURPOSES */
-
-
 int main(){
   // vcomplexe v1[5] = {{1.0, 2.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
   // vcomplexe v2[5] = {{1.0, 2.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
@@ -354,6 +438,6 @@ int main(){
   dcomplexe v2[5] = {{3.0, 4.0}, {3.0, 4.0}, {3.0, 4.0}, {3.0, 4.0}};
   dcomplexe r;
 
-  mncblas_zdotu_sub_omp(4, v1, 0, v2, 0, &r);
-  printf("dcomplexe : %f %f \n", r.REEL, r.IMAG);
+  mncblas_zdotc_sub_vec(4, v1, 0, v2, 0, &r);
+  printf("complexe : %f %f \n", r.REEL, r.IMAG);
 }
