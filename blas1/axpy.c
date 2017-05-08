@@ -293,29 +293,25 @@ void mncblas_zaxpy_omp(const int N, const void *alpha, const void *X,
   return ;
 }
 
-void mncblas_zaxpy_vec(const int N, const void *alpha, const void *X,
-       const int incX, void *Y, const int incY)
-{
-    register unsigned int i = 0 ;
-    register unsigned int j = 0 ;
-    double *XP = (double *) X;
-    double *YP = (double *) Y;
-    double *AP = (double *) alpha;
-    register double reel;
-    register double imag;
-    dcomplexe temp;
-
-    for (; ((i < N*2) && (j < N*2)) ; i += incX +1 , j+=incY +1){
-      temp.REEL = (AP[0] * *(XP+i)) - (AP[1] * *(XP+i+1));
-      temp.IMAG = (AP[0] * *(XP+i+1)) + (AP[1] * *(XP+i));
-      *(YP+j) = temp.REEL + YP[j];
-      *(YP+j+1) = temp.IMAG + *(YP+j+1);
-    }
-}
-
-// void mncblas_saxpy_omp (const int N, const float alpha, const float *X,
-//            const int incX, float *Y, const int incY)
+// void mncblas_zaxpy_vec(const int N, const void *alpha, const void *X,
+//        const int incX, void *Y, const int incY)
 // {
+//     register unsigned int i = 0 ;
+//     register unsigned int j = 0 ;
+//     double *XP = (double *) X;
+//     double *YP = (double *) Y;
+//     double *AP = (double *) alpha;
+//     register double reel;
+//     register double imag;
+//     dcomplexe temp;
+
+//     for (; ((i < N*2) && (j < N*2)) ; i += incX +1 , j+=incY +1){
+//       temp.REEL = (AP[0] * *(XP+i)) - (AP[1] * *(XP+i+1));
+//       temp.IMAG = (AP[0] * *(XP+i+1)) + (AP[1] * *(XP+i));
+//       *(YP+j) = temp.REEL + YP[j];
+//       *(YP+j+1) = temp.IMAG + *(YP+j+1);
+//     }
+// }
 
 /* FOR TEST PURPOSES */
 void printvec(double v[], int size){
@@ -344,11 +340,11 @@ void printvec3(DCOMP v){
 }
 
 int main(){
-  // VCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
-  // VCOMP V2 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
+  VCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
+  VCOMP V2 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
 
-  // vcomplexe a = {1.0, 2.0};
-  // vcomplexe *p1 = &a;
+  vcomplexe a = {1.0, 2.0};
+  vcomplexe *p1 = &a;
 
   //printvec2(V1);
   //printvec2(V2);
@@ -358,23 +354,24 @@ int main(){
 
 
 
-  //  TEST SIMPLE COMPLEX OMP
+  // TEST SIMPLE COMPLEX OMP
   // mncblas_caxpy (4, p1, V1, 0, V2, 0);
-  // mncblas_caxpy_omp (4, p1, V1, 0, V2, 0);
-  // printvec2(V2);
+  mncblas_caxpy_omp (4, p1, V1, 0, V2, 0);
+  // mncblas_caxpy_vec (4, p1, V1, 0, V2, 0);
+  printvec2(V2);
 
 
 
-  //  TEST DOUBLE COMPLEX OMP
-  DCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
-  DCOMP V2 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
+  // //  TEST DOUBLE COMPLEX OMP
+  // DCOMP V1 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
+  // DCOMP V2 = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
 
-  dcomplexe a = {1.0, 2.0};
-  dcomplexe *p1 = &a;
+  // dcomplexe a = {1.0, 2.0};
+  // dcomplexe *p1 = &a;
 
-  // mncblas_zaxpy (4, p1, V1, 0, V2, 0);
-  mncblas_zaxpy_omp (4, p1, V1, 0, V2, 0);
-  printvec3(V2);
+  //  mncblas_zaxpy (4, p1, V1, 0, V2, 0);
+  // // mncblas_zaxpy_omp (4, p1, V1, 0, V2, 0);
+  // printvec3(V2);
 
 
 
