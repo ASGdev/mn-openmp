@@ -43,6 +43,12 @@ void bulle_omp (int * tab, int num_t){
             }
         }
     }
+
+    for(int i = 0; i<ARRAY_SIZE-1; i++){
+        if(b[i]>b[i+1]){
+            bulle_seq(b);
+        }
+    }
 }
 
 int main(){
@@ -61,12 +67,6 @@ int main(){
 	omp_set_num_threads(2);
 
     bulle_omp(b, num_t);
-
-    for(int i = 0; i<ARRAY_SIZE-1; i++){
-        if(b[i]>b[i+1]){
-            bulle_seq(b);
-        }
-    }
 
     printf("TABLEAU TRIÉ : ");
     for(int i = 0; i<ARRAY_SIZE; i++){
