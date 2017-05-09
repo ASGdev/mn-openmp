@@ -21,6 +21,14 @@ void bulle_seq (int * tab){
     }
 }
 
+void bulle_trie (int * tab){
+    for(int i = 0; i<ARRAY_SIZE-1; i++){
+        if(tab[i]>tab[i+1]){
+            bulle_seq(tab);
+        }
+    }
+}
+
 void bulle_omp (int * tab, int num_t){
     int base;
     #pragma omp parallel for private(base)
@@ -43,12 +51,7 @@ void bulle_omp (int * tab, int num_t){
             }
         }
     }
-
-    for(int i = 0; i<ARRAY_SIZE-1; i++){
-        if(b[i]>b[i+1]){
-            bulle_seq(b);
-        }
-    }
+    bulle_trie(tab);
 }
 
 int main(){
