@@ -9,12 +9,13 @@
 #define ARRAY_SIZE 10
 #define DEBUG 1
 
+
 int* merge (int* tab){
     int *tempArray = malloc(ARRAY_SIZE * sizeof(int));
     int j = CHUNK_SIZE;
     int i = 0;
     int cpt = 0;
-    while( i != CHUNK_SIZE && j != ARRAY_SIZE){
+    while(cpt!=ARRAY_SIZE){
         if(tab[i] == INT_MAX) {
             printf("INT_MAX\n");
             tempArray[cpt] = tab[j];
@@ -34,44 +35,59 @@ int* merge (int* tab){
         printf("i = %d j = %d\n", i , j);
         printf("ARRAY_SIZE %d\n", ARRAY_SIZE);
         printf("CHUNK_SIZE %d\n", CHUNK_SIZE);
-        if (i == CHUNK_SIZE && j != ARRAY_SIZE){
-            printf("IF \n");
-            i = j;
-            j = j + CHUNK_SIZE;
+
+        if (i+1 == ARRAY_SIZE){
+            return tempArray;
         }
+        if (j == ARRAY_SIZE){
+            j = i+1;
+        }
+
+        // if (i == CHUNK_SIZE && j != ARRAY_SIZE){
+        // // if (cpt != ARRAY_SIZE){
+        //     printf("PAS FINI \n");
+        //     i = j;
+        //     j = j + CHUNK_SIZE;
+        // }
     }
     return tempArray;
 }
 
 
-// void merge (int* tab){
-//     int* tempArray;
+// int* merge (int* tab){
+//     int *tempArray = malloc(ARRAY_SIZE * sizeof(int));
 //     int j = CHUNK_SIZE;
 //     int i = 0;
 //     int cpt = 0;
-//     for(; i != CHUNK_SIZE; i++){
-//         while(j != ARRAY_SIZE){
-//             if(tab[i] == INT_MAX) {
-//                 tempArray[cpt] = tab[j];
-//                 tab[j] = INT_MAX;
-//                 printf("INT_MAX\n");
-//             }else if(tab[i] > tab[j]){
-//                 tempArray[cpt] = tab[j];
-//                 tab[j] = INT_MAX;
-//                 printf("I > J\n");
-//             } else {
-//                 tempArray[cpt] = tab[i];
-//                 tab[i] = INT_MAX;
-//                 printf("SINON\n");
-//             }
-//             cpt++;
-//             j++;
-//             break;
+//     while( i != CHUNK_SIZE && j != ARRAY_SIZE){
+//         if(tab[i] == INT_MAX) {
+//             printf("INT_MAX\n");
+//             tempArray[cpt] = tab[j];
+//             tab[j] = INT_MAX;
+//         }else if(tab[i] > tab[j]){
+//             printf("I > J\n");
+//             tempArray[cpt] = tab[j];
+//             tab[j] = INT_MAX;
+//         } else {
+//             printf("SINON\n");
+//             tempArray[cpt] = tab[i];
+//             tab[i] = INT_MAX;
+//         }
+//         cpt++;
+//         i++;
+//         j++;
+//         printf("i = %d j = %d\n", i , j);
+//         printf("ARRAY_SIZE %d\n", ARRAY_SIZE);
+//         printf("CHUNK_SIZE %d\n", CHUNK_SIZE);
+//         if (i == CHUNK_SIZE && j != ARRAY_SIZE){
+//         // if (cpt != ARRAY_SIZE){
+//             printf("IF \n");
+//             i = j;
+//             j = j + CHUNK_SIZE;
 //         }
 //     }
-//     // return tempArray;
+//     return tempArray;
 // }
-
 
 
 int main(){
