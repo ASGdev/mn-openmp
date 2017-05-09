@@ -72,9 +72,4 @@ int main(){
     for(int i = 0; i<ARRAY_SIZE; i++){
         printf("%d ", b[i]);
     }
-
-	// smooth it
-	// à finir -> regarder les frontières pour vérifier que c'est trié, sinon on retrie sur le tableau b pré-trié(goto)
-
-
 }

@@ -10,8 +10,6 @@
 typedef float *floatM;
 typedef double *doubleM;
 
-//typedef double matrix [4][4] ;
-
 typedef float float4 [4]  __attribute__ ((aligned (16))) ;
 typedef double double2 [2] __attribute__ ((aligned (16))) ;
 
@@ -29,7 +27,10 @@ typedef struct {
 
 typedef dcomplexe DCOMP [VEC_SIZE] ;
 
-typedef vcomplexe matrix[2][2];
+
+// typedef float matrix [4][4] ;
+// typedef double matrix [4][4] ;
+typedef vcomplexe matrix[4][4];
 
 void print_matrix (matrix M, int N)
 {
@@ -763,31 +764,43 @@ void mncblas_zgemm (
   return ;
 }
 
+void mncblas_zgemm_vec (
+        MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
+        MNCBLAS_TRANSPOSE TransB, const int M, const int N,
+        const int K, const void *alpha, const void *A,
+        const int lda, const void *B, const int ldb,
+        const void *beta, void *C, const int ldc
+       )
+{
+
+  return ;
+}
+
 int main(){
-	// matrix A = {
-	//     {1, 1, 1, 1},
-	//     {1, 1, 1, 1},
-	//     {1, 1, 1, 1},
-	//     {1, 1, 1, 1}
- //  	};
- //  	matrix B = {
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2}
- //  	};
- //  	matrix C1 = {
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2}
- //  	};
+	matrix A = {
+	    {1, 1, 1, 1},
+	    {1, 1, 1, 1},
+	    {1, 1, 1, 1},
+	    {1, 1, 1, 1}
+  	};
+  	matrix B = {
+	    {2, 2, 2, 2},
+	    {2, 2, 2, 2},
+	    {2, 2, 2, 2},
+	    {2, 2, 2, 2}
+  	};
+  	matrix C1 = {
+	    {2, 2, 2, 2},
+	    {2, 2, 2, 2},
+	    {2, 2, 2, 2},
+	    {2, 2, 2, 2}
+  	};
 
-	// float alpha = 1;
-	// float beta = 1;
+	float alpha = 1;
+	float beta = 1;
 
-	// mncblas_sgemm_omp (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
-	// print_matrix(C1, 4);
+	mncblas_sgemm_omp (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
+	print_matrix(C1, 4);
 
 	// matrix C2 = {
 	//     {2, 2, 2, 2},
