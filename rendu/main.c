@@ -158,7 +158,6 @@ void print_vectors_double (doubleVector X, doubleVector Y)
 
 int main ()
 {
-  printf("yo\n");
   int nthreads, maxnthreads ;
 
   int tid;
@@ -942,7 +941,7 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("Complex Double Precision - SSE");
+  printf ("Complex Double Precision - SSE\n");
   printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   printf ("\n=============== SWAP ===============\n") ;
@@ -963,8 +962,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("\nSimple Precision - sequential\n");
-  printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
@@ -984,8 +982,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Simple Precision - OMP\n");
-  printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
@@ -1005,8 +1002,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Simple Precision - SSE\n");
-  printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
@@ -1026,8 +1022,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("\nDouble Precision - sequential\n");
-  printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
@@ -1047,8 +1042,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Double Precision - OMP\n");
-  printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
@@ -1068,8 +1062,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Double Precision - SSE\n");
-  printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
@@ -1089,8 +1082,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("\nComplex Simple Precision - sequential\n");
-  printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
@@ -1110,8 +1102,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Complex Simple Precision - OMP\n");
-  printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
@@ -1131,13 +1122,95 @@ int main ()
   av = average (experiments) ;
 
   printf ("Complex Simple Precision - SSE\n");
-  printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
   init_vector_dcomplexe (g, zvalue) ;
   init_vector_dcomplexe (h, zvalue) ;
+
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
+
+      mncblas_zswap(N, g, 1, h, 1);
+
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
+
+  av = average (experiments) ;
+
+  printf ("\nComplex Double Precision - sequential\n");
+  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+
+  /**/
+
+  init_vector_dcomplexe (g, zvalue) ;
+  init_vector_dcomplexe (h, zvalue) ;
+
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
+
+      mncblas_zswap_omp(N, g, 1, h, 1);
+
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
+
+  av = average (experiments) ;
+
+  printf ("Complex Double Precision - OMP\n");
+  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+
+  /**/
+
+  // init_vector_dcomplexe (g, zvalue) ;
+  // init_vector_dcomplexe (h, zvalue) ;
+
+  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+  //   {
+  //     start = _rdtsc () ;
+
+  //     //mncblas_zswap_vec(N, g, 1, h, 1);
+
+  //     end = _rdtsc () ;
+  //     experiments [exp] = end - start ;
+  //   }
+
+  // av = average (experiments) ;
+
+  // printf ("Complex Double Precision - SSE\n");
+  // printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+
+  printf ("=============== GEMV ===============\n") ;
+
+  init_vector_float (a, 1.0) ;
+  init_vector_float (b, 1.0) ;
+  init_matrix_float (bm, 2.0) ;
+  float alphagmv = 1.0, betagmv = 2.0;
+
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
+
+      mncblas_sgemv(101, 111, N, N, alphagmv, *bm, 0, a, 1, betagmv, b, 1);
+
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
+
+  av = average (experiments) ;
+
+  printf ("\nSimple Precision - sequential");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+
+  /**/
+
+  init_vector_float (a, 1.0) ;
+  init_matrix_float (bm, 2.0) ;
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
@@ -1150,14 +1223,14 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("\nComplex Double Precision - sequential");
+  printf ("Simple Precision - OMP");
   printf ("\t%Ld cycles\n", av-residu) ;
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
   /**/
 
-  init_vector_dcomplexe (g, zvalue) ;
-  init_vector_dcomplexe (h, zvalue) ;
+  init_vector_float (a, 1.0) ;
+  init_matrix_float (bm, 2.0) ;
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
@@ -1170,91 +1243,11 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("Complex Double Precision - OMP");
+  printf ("Simple Precision - SSE");
   printf ("\t%Ld cycles\n", av-residu) ;
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
   /**/
-
-  init_vector_dcomplexe (g, zvalue) ;
-  init_vector_dcomplexe (h, zvalue) ;
-
-  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-    {
-      start = _rdtsc () ;
-
-
-      end = _rdtsc () ;
-      experiments [exp] = end - start ;
-    }
-
-  av = average (experiments) ;
-
-  printf ("Complex Double Precision - SSE");
-  printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
-
-  // printf ("=============== GEMV ===============\n") ;
-
-  // init_vector_float (a, 1.0) ;
-  // init_matrix_float (bm, 2.0) ;
-
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
-
-
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
-
-  // av = average (experiments) ;
-
-  // printf ("Simple Precision - sequential");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
-
-  // /**/
-
-  // init_vector_float (a, 1.0) ;
-  // init_matrix_float (bm, 2.0) ;
-
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
-
-
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
-
-  // av = average (experiments) ;
-
-  // printf ("Simple Precision - OMP");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
-
-  // /**/
-
-  // init_vector_float (a, 1.0) ;
-  // init_matrix_float (bm, 2.0) ;
-
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
-
-
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
-
-  // av = average (experiments) ;
-
-  // printf ("Simple Precision - SSE");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
-
-  // /**/
 
   // init_vector_double (c, 1.0) ;
   // init_vector_double (d, 2.0) ;
