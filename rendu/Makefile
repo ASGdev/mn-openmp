@@ -1,9 +1,10 @@
 all: main
 
-CC=gcc -Wall -fopenmp -msse4.2
+#CC=gcc -Wno-unused-variable -fopenmp -msse4.2
+CC=gcc -Wno-unused-variable -fopenmp -msse4.2
 
 main:
-	$(CC) main.c axpy.c copy.c -o main
+	$(CC) *.c -o main
 
 
 clean:

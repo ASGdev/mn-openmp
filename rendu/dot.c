@@ -1,34 +1,8 @@
 #include "mnblas.h"
 #include <x86intrin.h>
-#include <emmintrin.h>
-#include <stdio.h>
 
 #define XMM_NUMBER 8
-#define VEC_SIZE 5
 
-typedef struct {
-  float REEL;
-  float IMAG;
-}vcomplexe;
-
-typedef vcomplexe VCOMP [VEC_SIZE] ;
-
-typedef struct {
-  double REEL;
-  double IMAG;
-}dcomplexe;
-
-typedef dcomplexe DCOMP [VEC_SIZE] ;
-
-typedef float float4 [4] __attribute__ ((aligned (16))) ;
-typedef double double2 [2] __attribute__ ((aligned (16))) ;
-
-void printvec(double v[], int size){
-  for(int i = 0 ; i<size; i++)
-    printf("%f ", v[i]);
-
-  printf("\n");
-}
 
 float mncblas_sdot(const int N, const float *X, const int incX, 
                  const float *Y, const int incY)
@@ -411,33 +385,4 @@ void mncblas_zdotc_sub_vec(const int N, const void *X, const int incX,
   }
 
   return ;
-}
-
-
-/* FOR TEST PURPOSES */
-int main(){
-  // vcomplexe v1[5] = {{1.0, 2.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
-  // vcomplexe v2[5] = {{1.0, 2.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
-  // double v1[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
-  // double v2[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
-
-
-  // printf("Dot d seq : %f\n", mncblas_ddot(5, v1, 1, v2, 1));
-  // printf("Dot d p : %f\n", mncblas_ddot_omp(5, v1, 1, v2, 1));
-  // printf("Dot d vec : %f\n", mncblas_ddot_vec(5, v1, 0, v2, 0));
-
-  // float v3[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
-  // float v4[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
-
-  // printf("Dot s seq : %f\n", mncblas_sdot(5, v3, 1, v4, 1));
-  // printf("Dot s p : %f\n", mncblas_sdot_omp(5, v3, 1, v4, 1));
-  // printf("Dot s vec : %f\n", mncblas_sdot_vec(5, v3, 0, v4, 0));
-  // mncblas_cdotu_sub(5, v1, 0, v2, 0, &r);
-
-  dcomplexe v1[5] = {{1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}, {1.0, 2.0}};
-  dcomplexe v2[5] = {{3.0, 4.0}, {3.0, 4.0}, {3.0, 4.0}, {3.0, 4.0}};
-  dcomplexe r;
-
-  mncblas_zdotc_sub_vec(4, v1, 0, v2, 0, &r);
-  printf("complexe : %f %f \n", r.REEL, r.IMAG);
 }

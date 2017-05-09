@@ -10,7 +10,7 @@
 #define DEBUG 1
 
 int* merge (int* tab){
-    int tempArray[ARRAY_SIZE];
+    int *tempArray = malloc(ARRAY_SIZE * sizeof(int));
     int j = CHUNK_SIZE;
     int i = 0;
     int cpt = 0;
@@ -40,7 +40,7 @@ int* merge (int* tab){
             j = j + CHUNK_SIZE;
         }
     }
-    return *tempArray;
+    return tempArray;
 }
 
 

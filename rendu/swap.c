@@ -1,25 +1,5 @@
 #include "mnblas.h"
 #include <x86intrin.h>
-#include <stdio.h>
-
-#define VEC_SIZE 5
-
-typedef struct {
-  float REEL;
-  float IMAG;
-}vcomplexe;
-
-typedef vcomplexe VCOMP [VEC_SIZE] ;
-
-typedef struct {
-  double REEL;
-  double IMAG;
-}dcomplexe;
-
-typedef dcomplexe DCOMP [VEC_SIZE] ;
-
-typedef float float4 [4] __attribute__ ((aligned (16))) ;
-typedef double double2 [2] __attribute__ ((aligned (16))) ;
 
 void mncblas_sswap(const int N, float *X, const int incX, 
                  float *Y, const int incY)
@@ -251,42 +231,3 @@ void mncblas_zswap_vec(const int N, void *X, const int incX,
   return ;
 }
 
-/* FOR TEST PURPOSES */
-void printvec(float v[], int size){
-  for(int i = 0 ; i<size; i++)
-    printf("%f ", v[i]);
-
-  printf("\n");
-}
-
-void printvec2(VCOMP v){
-  for(int i = 0 ; i< VEC_SIZE; i++){
-    vcomplexe cc = v[i];
-    printf("(%f, %f) ", cc.REEL, cc.IMAG);
-  }
-
-  printf("\n");
-}
-
-int main(){
-  // double v1[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
-  // double v2[5] = {6.0, 7.0, 8.0, 9.0, 10.0};
-
-  // printvec(v1, 5);
-  // printvec(v2, 5);
-  // mncblas_dswap_omp(5, v1, 1, v2, 1);
-  // printvec(v1, 5);
-  // printvec(v2, 5);
-
-  VCOMP V1 = {{1.0, 1.0}, {2.0, 2.0}, {3.0, 3.0}, {4.0, 4.0}, {5.0, 5.0}};
-  VCOMP V2 = {{6.0, 6.0}, {7.0, 7.0}, {8.0, 8.0}, {9.0, 9.0}, {10.0, 10.0}};
-
-  printvec2(V1);
-  printvec2(V2);
-
-  mncblas_cswap_omp(5, V1, 0, V2, 0);
-
-  printvec2(V1);
-  printvec2(V2);
-
-}

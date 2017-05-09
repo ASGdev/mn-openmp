@@ -193,6 +193,21 @@ float  mncblas_sdot_omp (
 		     const float  *Y, const int incY
 		    ) ;
 
+float mncblas_sdot_vec (
+		     const int N, const float *X, const int incX,
+		     const float *Y, const int incY
+		    ) ;
+
+double mncblas_ddot (
+		     const int N, const double *X, const int incX,
+		     const double *Y, const int incY
+		    ) ;
+
+double mncblas_ddot_omp (
+		     const int N, const double *X, const int incX,
+		     const double *Y, const int incY
+		    ) ;
+
 double mncblas_ddot_vec (
 		     const int N, const double *X, const int incX,
 		     const double *Y, const int incY
