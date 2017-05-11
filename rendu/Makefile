@@ -1,6 +1,5 @@
 all: main
 
-#CC=gcc -Wno-unused-variable -fopenmp -msse4.2
 CC=gcc -Wno-unused-variable -fopenmp -msse4.2
 
 main:

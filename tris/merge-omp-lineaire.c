@@ -15,14 +15,12 @@ void fusion(int a[], int ig, int id, int m){
 	int ad[adSize];
 	int ag[agSize];
 
-	// fill ad
 	for(int i=0; i<(adSize); i++)
 		ad[i] = a[m+1+i];
 
 	for(int i=0; i<(agSize); i++)
 		ag[i] = a[ig+i];
 
-	// merge
 	int i1 = 0;
 	int i2 = 0;
 	int ia = ig;
@@ -54,14 +52,14 @@ void fusion(int a[], int ig, int id, int m){
 
 }
 
-void tri(int a[], int ig, int id){
+void tri_fusion(int a[], int ig, int id){
 
 	if(ig < id){
 		int m = (ig + id)/2;
 		printf("Middle : %d\n", m);
 
-		tri(a, ig, m);
-		tri(a, m+1, id);
+		tri_fusion(a, ig, m);
+		tri_fusion(a, m+1, id);
 
 		fusion(a, ig, id, m);
 	}

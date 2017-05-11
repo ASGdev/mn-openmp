@@ -9,23 +9,21 @@
 #define DEBUG 1
 
 void fusion(int a[], int ig, int id, int m){
-	int agSize = m-ig+1;
-	int adSize = id - m;
+	register int agSize = m-ig+1;
+	register int adSize = id - m;
 
-	int ad[adSize];
-	int ag[agSize];
+	register int ad[adSize];
+	register int ag[agSize];
 
-	// fill ad
-	for(int i=0; i<(adSize); i++)
+	for(register int i=0; i<(adSize); i++)
 		ad[i] = a[m+1+i];
 
-	for(int i=0; i<(agSize); i++)
+	for(register int i=0; i<(agSize); i++)
 		ag[i] = a[ig+i];
 
 	// merge
-	int i1 = 0;
-	int i2 = 0;
-	int ia = ig;
+	register int i1 = i2 = 0;
+	register int ia = ig;
 	while(i1<adSize && i2<agSize){
 		if(ag[i2] <= ad[i1]){
 			a[ia] = ag[i2];
@@ -52,15 +50,15 @@ void fusion(int a[], int ig, int id, int m){
 
 }
 
-void tri(int a[], int ig, int id){
+void tri_fusion_omp(int a[], int ig, int id){
 
 	if(ig < id){
 		int m = (ig + id)/2;
 
 		#pragma omp task
-		tri(a, ig, m);
+		tri_fusion(a, ig, m);
 		#pragma omp task
-		tri(a, m+1, id);
+		tri_fusion(a, m+1, id);
 		#pragma omp wait
 
 		fusion(a, ig, id, m);

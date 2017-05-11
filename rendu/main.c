@@ -3,17 +3,17 @@
 #include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
+#include <x86intrin.h>
 
 #include "mnblas.h"
-
-#include <x86intrin.h>
+#include "tris.h"
 
 #define NBEXPERIMENTS    22
 static long long unsigned int experiments [NBEXPERIMENTS] ;
 
-
 #define N              512
 #define TILE           16
+#define SORT_ARRAY_SIZE 512
 
 typedef float floatVector [N] ;
 typedef double doubleVector [N] ;
@@ -156,6 +156,14 @@ void print_vectors_double (doubleVector X, doubleVector Y)
   return ;
 }
 
+void random_fill(int tab[], int size, int max){
+  srand(time(NULL));
+  for(int i = 0; i<size; i++)
+    tab[i] = rand()%max - 1;
+}
+
+
+/* =============== Tests ===================*/
 int main ()
 {
   int nthreads, maxnthreads ;
@@ -198,7 +206,7 @@ int main ()
 
 
   printf ("=============================== BLAS ===============================\n") ;
-  printf ("=============== AXPY ===============\n") ;
+  printf ("\n=============== AXPY ===============\n") ;
 
   init_vector_float (a, 1.0) ;
   init_vector_float (b, 2.0) ;
@@ -280,7 +288,7 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("Double Precision - sequential\n");
+  printf ("\nDouble Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
@@ -344,7 +352,7 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("Complex Simple Precision - sequential\n");
+  printf ("\nComplex Simple Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
@@ -513,7 +521,7 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("Simple Precision - SSE\n\n");
+  printf ("Simple Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
@@ -534,7 +542,7 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("Double Precision - sequential\n");
+  printf ("\nDouble Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
@@ -576,7 +584,7 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("Double Precision - SSE\n\n");
+  printf ("Double Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
@@ -598,7 +606,7 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("Complex Simple Precision - sequential\n");
+  printf ("\nComplex Simple Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
@@ -638,7 +646,7 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("Complex Simple Precision - SSE");
+  printf ("Complex Simple Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
@@ -721,7 +729,7 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("\nSimple Precision - sequential\n");
+  printf ("Simple Precision - sequential\n");
   printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
@@ -961,7 +969,7 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("\nSimple Precision - sequential\n");
+  printf ("Simple Precision - sequential\n");
   printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
@@ -1113,7 +1121,7 @@ int main ()
     {
       start = _rdtsc () ;
 
-      mncblas_cswap_vec(N, e, 1, f, 1);
+      //mncblas_cswap_vec(N, e, 1, f, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1133,7 +1141,7 @@ int main ()
     {
       start = _rdtsc () ;
 
-      mncblas_zswap(N, g, 1, h, 1);
+      //mncblas_zswap(N, g, 1, h, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1153,7 +1161,7 @@ int main ()
     {
       start = _rdtsc () ;
 
-      mncblas_zswap_omp(N, g, 1, h, 1);
+      //mncblas_zswap_omp(N, g, 1, h, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1166,36 +1174,36 @@ int main ()
 
   /**/
 
-  // init_vector_dcomplexe (g, zvalue) ;
-  // init_vector_dcomplexe (h, zvalue) ;
+  init_vector_dcomplexe (g, zvalue) ;
+  init_vector_dcomplexe (h, zvalue) ;
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  //     //mncblas_zswap_vec(N, g, 1, h, 1);
+      //mncblas_zswap_vec(N, g, 1, h, 1);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // av = average (experiments) ;
+  av = average (experiments) ;
 
-  // printf ("Complex Double Precision - SSE\n");
-  // printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("Complex Double Precision - SSE\n");
+  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
-  printf ("=============== GEMV ===============\n") ;
+  printf ("\n=============== GEMV ===============\n") ;
 
   init_vector_float (a, 1.0) ;
   init_vector_float (b, 1.0) ;
   init_matrix_float (bm, 2.0) ;
-  float alphagmv = 1.0, betagmv = 2.0;
+  float alphafgmv = 1.0, betafgmv = 2.0;
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
       start = _rdtsc () ;
 
-      mncblas_sgemv(101, 111, N, N, alphagmv, *bm, 0, a, 1, betagmv, b, 1);
+      mncblas_sgemv(101, 111, N, N, alphafgmv, *bm, 0, a, 1, betafgmv, b, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1203,7 +1211,7 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("\nSimple Precision - sequential");
+  printf ("\nSimple Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
@@ -1216,6 +1224,7 @@ int main ()
     {
       start = _rdtsc () ;
 
+      mncblas_sgemv_omp(101, 111, N, N, alphafgmv, *bm, 0, a, 1, betafgmv, b, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1223,7 +1232,7 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("Simple Precision - OMP");
+  printf ("Simple Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
@@ -1236,6 +1245,7 @@ int main ()
     {
       start = _rdtsc () ;
 
+      mncblas_sgemv_vec(101, 111, N, N, alphafgmv, *bm, 0, a, 1, betafgmv, b, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1243,492 +1253,569 @@ int main ()
 
   av = average (experiments) ;
 
-  printf ("Simple Precision - SSE");
+  printf ("Simple Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
   /**/
 
-  // init_vector_double (c, 1.0) ;
-  // init_vector_double (d, 2.0) ;
+  init_vector_double (c, 1.0) ;
+  init_vector_double (d, 1.0) ;
+  init_matrix_double (cm, 2.0) ;
+  double alphadgmv = 1.0, betadgmv = 2.0;
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
+      mncblas_dgemv_vec(101, 111, N, N, alphadgmv, *cm, 0, c, 1, betadgmv, d, 1);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // av = average (experiments) ;
+  av = average (experiments) ;
 
-  // printf ("Double Precision - sequential");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\nDouble Precision - sequential\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // /**/
+  /**/
 
-  // init_vector_double (c, 1.0) ;
-  // init_vector_double (d, 2.0) ;
+  init_vector_double (c, 1.0) ;
+  init_vector_double (d, 2.0) ;
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
+      mncblas_dgemv_vec(101, 111, N, N, alphadgmv, *cm, 0, c, 1, betadgmv, d, 1);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // av = average (experiments) ;
+  av = average (experiments) ;
 
-  // printf ("Double Precision - OMP");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("Double Precision - OMP\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // /**/
+  /**/
 
-  // init_vector_double (c, 1.0) ;
-  // init_vector_double (d, 2.0) ;
+  init_vector_double (c, 1.0) ;
+  init_vector_double (d, 2.0) ;
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
+      mncblas_dgemv_vec(101, 111, N, N, alphadgmv, *cm, 0, c, 1, betadgmv, d, 1);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // av = average (experiments) ;
+  av = average (experiments) ;
 
-  // printf ("Double Precision - SSE");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("Double Precision - SSE\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // /**/
+  /**/
 
-  // init_vector_vcomplexe (e, cvalue) ;
-  // init_vector_vcomplexe (f, cvalue) ;
+  init_vector_vcomplexe (e, cvalue) ;
+  init_vector_vcomplexe (f, cvalue) ;
+  //init_matrix_vcomplexe (*em, cvalue); ISSUE
+  vcomplexe alphacgmv = {1.0, 2.0};
+  vcomplexe betacgmv = {1.0, 2.0};
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
+      //mncblas_cgemv(101, 111, N, N, &alphacgmv, &em, 0, &e, 1, &betacgmv, &f, 1);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // av = average (experiments) ;
+  av = average (experiments) ;
 
-  // printf ("Complex Simple Precision - sequential");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\nComplex Simple Precision - sequential\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // /**/
+  /**/
 
-  // init_vector_vcomplexe (e, cvalue) ;
-  // init_vector_vcomplexe (f, cvalue) ;
+  init_vector_vcomplexe (e, cvalue) ;
+  init_vector_vcomplexe (f, cvalue) ;
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
+      mncblas_cgemv_omp(101, 111, N, N, &alphacgmv, &em, 0, &e, 1, &betacgmv, &f, 1);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // av = average (experiments) ;
+  av = average (experiments) ;
 
-  // printf ("Complex Simple Precision - OMP");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("Complex Simple Precision - OMP\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // /**/
+  /**/
 
-  // init_vector_vcomplexe (e, cvalue) ;
-  // init_vector_vcomplexe (f, cvalue) ;
+  init_vector_vcomplexe (e, cvalue) ;
+  init_vector_vcomplexe (f, cvalue) ;
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
+      mncblas_cgemv_vec(101, 111, N, N, &alphacgmv, &em, 0, &e, 1, &betacgmv, &f, 1);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // av = average (experiments) ;
+  av = average (experiments) ;
 
-  // printf ("Complex Simple Precision - SSE");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("Complex Simple Precision - SSE\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // /**/
+  /**/
 
-  // init_vector_dcomplexe (g, zvalue) ;
-  // init_vector_dcomplexe (h, zvalue) ;
+  init_vector_dcomplexe (g, zvalue) ;
+  init_vector_dcomplexe (h, zvalue) ;
+  // init_matrix_dcomplexe (*gm, zvalue); ISSUE
+  dcomplexe alphazgmv = {1.0, 2.0};
+  dcomplexe betazgmv = {1.0, 2.0};
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
+      mncblas_zgemv(101, 111, N, N, &alphazgmv, &gm, 0, &g, 1, &betazgmv, &h, 1);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // av = average (experiments) ;
+  av = average (experiments) ;
 
-  // printf ("Complex Double Precision - sequential");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\nComplex Double Precision - sequential\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // /**/
+  /**/
 
-  // init_vector_dcomplexe (g, zvalue) ;
-  // init_vector_dcomplexe (h, zvalue) ;
+  init_vector_dcomplexe (g, zvalue) ;
+  init_vector_dcomplexe (h, zvalue) ;
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
+      mncblas_zgemv(101, 111, N, N, &alphazgmv, &gm, 0, &g, 1, &betazgmv, &h, 1);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // av = average (experiments) ;
+  av = average (experiments) ;
 
-  // printf ("Complex Double Precision - OMP");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("Complex Double Precision - OMP\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // /**/
+  /**/
 
-  // init_vector_dcomplexe (g, zvalue) ;
-  // init_vector_dcomplexe (h, zvalue) ;
+  init_vector_dcomplexe (g, zvalue) ;
+  init_vector_dcomplexe (h, zvalue) ;
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
+      mncblas_zgemv(101, 111, N, N, &alphazgmv, &gm, 0, &g, 1, &betazgmv, &h, 1);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // av = average (experiments) ;
+  av = average (experiments) ;
 
-  // printf ("Complex Double Precision - SSE");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("Complex Double Precision - SSE\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // printf ("=============== GEMM ===============\n") ;
+  printf ("\n=============== GEMM ===============\n") ;
 
-  // init_vector_float (a, 1.0) ;
-  // init_vector_float (b, 2.0) ;
+  floatMatrix cfgemm;
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  init_vector_float (a, 1.0) ;
+  init_vector_float (b, 2.0) ;
+  init_matrix_float (am, 1.0);
+  init_matrix_float (bm, 1.0);
+  init_matrix_float (cfgemm, 1.0);
+  alphaf = 1.0;
+  float betaf = 1.0;
 
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      mncblas_sgemm (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
 
-  // av = average (experiments) ;
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // printf ("Simple Precision - sequential");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  av = average (experiments) ;
 
-  // /**/
+  printf ("Simple Precision - sequential\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // init_vector_float (a, 1.0) ;
-  // init_vector_float (b, 2.0) ;
+  /**/
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  init_vector_float (a, 1.0) ;
+  init_vector_float (b, 2.0) ;
+  init_matrix_float (am, 1.0);
+  init_matrix_float (bm, 1.0);
+  init_matrix_float (cfgemm, 1.0);
 
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      mncblas_sgemm_omp (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
 
-  // av = average (experiments) ;
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // printf ("Simple Precision - OMP");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  av = average (experiments) ;
 
-  // /**/
+  printf ("Simple Precision - OMP\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // init_vector_float (a, 1.0) ;
-  // init_vector_float (b, 2.0) ;
+  /**/
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  init_vector_float (a, 1.0) ;
+  init_vector_float (b, 2.0) ;
+  init_matrix_float (am, 1.0);
+  init_matrix_float (bm, 1.0);
+  init_matrix_float (cfgemm, 1.0);
 
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      //mncblas_sgemm_vec (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
 
-  // av = average (experiments) ;
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // printf ("Simple Precision - SSE");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  av = average (experiments) ;
 
-  // /**/
+  printf ("Simple Precision - SSE\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // init_vector_double (c, 1.0) ;
-  // init_vector_double (d, 2.0) ;
+  /**/
+  double alphadgmm = 1.0;
+  double betadgmm = 2.0;
+  doubleMatrix *dgemm;
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  init_vector_double (c, 1.0) ;
+  init_vector_double (d, 2.0) ;
+  init_matrix_double (cm, 1.0);
+  init_matrix_double (dm, 1.0);
+  init_matrix_double (*dgemm, 1.0);
 
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      //mncblas_dgemm (101, 111, 111, N, N, N, alphadgmm, *cm, 1, *dm, 1, betadgmm, (double *)dgemm, 1);
 
-  // av = average (experiments) ;
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // printf ("Double Precision - sequential");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  av = average (experiments) ;
 
-  // /**/
+  printf ("\nDouble Precision - sequential\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // init_vector_double (c, 1.0) ;
-  // init_vector_double (d, 2.0) ;
+  /**/
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  init_vector_double (c, 1.0) ;
+  init_vector_double (d, 2.0) ;
+  init_matrix_double (cm, 1.0);
+  init_matrix_double (dm, 1.0);
+  init_matrix_double (*dgemm, 1.0);
 
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      //mncblas_dgemm_omp (101, 111, 111, N, N, N, alphadgmm, *cm, 1, *dm, 1, betadgmm, (double *)dgemm, 1);
 
-  // av = average (experiments) ;
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // printf ("Double Precision - OMP");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  av = average (experiments) ;
 
-  // /**/
+  printf ("Double Precision - OMP\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // init_vector_double (c, 1.0) ;
-  // init_vector_double (d, 2.0) ;
+  /**/
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  init_vector_double (c, 1.0) ;
+  init_vector_double (d, 2.0) ;
+  init_matrix_double (cm, 1.0);
+  init_matrix_double (dm, 1.0);
+  init_matrix_double (*dgemm, 1.0);
 
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+      //mncblas_dgemm_vec (101, 111, 111, N, N, N, alphadgmm, *cm, 1, *dm, 1, betadgmm, (double *)dgemm, 1);
 
-  // av = average (experiments) ;
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // printf ("Double Precision - SSE");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  av = average (experiments) ;
 
-  // /**/
+  printf ("Double Precision - SSE\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // init_vector_vcomplexe (e, cvalue) ;
-  // init_vector_vcomplexe (f, cvalue) ;
+  /**/
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  vcomplexe alphacgmm = {1.0, 1.0};
+  vcomplexe betacgmm = {2.0, 2.0};
+  vcompMatrix *ccgemm;
 
+  init_vector_vcomplexe (e, cvalue) ;
+  init_vector_vcomplexe (f, cvalue) ;
+  init_matrix_vcomplexe (*em, cvalue);
+  init_matrix_vcomplexe (*fm, cvalue);
+  init_matrix_vcomplexe (*ccgemm, cvalue);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  // av = average (experiments) ;
+      mncblas_cgemm (101, 111, 111, N, N, N, &alphacgmm, *em, 1, *fm, 1, &betacgmm, (float *)ccgemm, 1);
 
-  // printf ("Complex Simple Precision - sequential");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // /**/
+  av = average (experiments) ;
 
-  // init_vector_vcomplexe (e, cvalue) ;
-  // init_vector_vcomplexe (f, cvalue) ;
+  printf ("\nComplex Simple Precision - sequential\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  /**/
 
+  init_vector_vcomplexe (e, cvalue) ;
+  init_vector_vcomplexe (f, cvalue) ;
+  init_matrix_vcomplexe (*em, cvalue);
+  init_matrix_vcomplexe (*fm, cvalue);
+  init_matrix_vcomplexe (*ccgemm, cvalue);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  // av = average (experiments) ;
+      //mncblas_cgemm_omp (101, 111, 111, N, N, N, &alphacgmm, *em, 1, *fm, 1, &betacgmm, (float *)ccgemm, 1);
 
-  // printf ("Complex Simple Precision - OMP");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // /**/
+  av = average (experiments) ;
 
-  // init_vector_vcomplexe (e, cvalue) ;
-  // init_vector_vcomplexe (f, cvalue) ;
+  printf ("Complex Simple Precision - OMP\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  /**/
 
+  init_vector_vcomplexe (e, cvalue) ;
+  init_vector_vcomplexe (f, cvalue) ;
+  init_matrix_vcomplexe (*em, cvalue);
+  init_matrix_vcomplexe (*fm, cvalue);
+  init_matrix_vcomplexe (*ccgemm, cvalue);
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  // av = average (experiments) ;
+      //mncblas_cgemm_vec (101, 111, 111, N, N, N, &alphacgmm, *em, 1, *fm, 1, &betacgmm, (float *)ccgemm, 1);
 
-  // printf ("Complex Simple Precision - SSE");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // /**/
+  av = average (experiments) ;
 
-  // init_vector_dcomplexe (g, zvalue) ;
-  // init_vector_dcomplexe (h, zvalue) ;
+  printf ("Complex Simple Precision - SSE\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  /**/
 
+  dcomplexe alphazgmm = {1.0, 1.0};
+  dcomplexe betazgmm = {2.0, 2.0};
+  dcompMatrix *czgemm;
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+  init_vector_dcomplexe (g, zvalue) ;
+  init_vector_dcomplexe (h, zvalue) ;
+  init_matrix_dcomplexe (*gm, zvalue);
+  init_matrix_dcomplexe (*hm, zvalue);
+  init_matrix_dcomplexe (*czgemm, zvalue);
 
-  // av = average (experiments) ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  // printf ("Complex Double Precision - sequential");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+      mncblas_zgemm(101, 111, 111, N, N, N, &alphazgmm, *gm, 1, *hm, 1, &betazgmm, (float *)czgemm, 1);
 
-  // /**/
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // init_matrix_dcomplexe (gm, zvalue) ;
-  // init_matrix_dcomplexe (hm, zvalue) ;
+  av = average (experiments) ;
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  printf ("\nComplex Double Precision - sequential\n");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
+  /**/
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+  init_vector_dcomplexe (g, zvalue) ;
+  init_vector_dcomplexe (h, zvalue) ;
+  init_matrix_dcomplexe (*gm, zvalue);
+  init_matrix_dcomplexe (*hm, zvalue);
+  init_matrix_dcomplexe (*czgemm, zvalue);
 
-  // av = average (experiments) ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  // printf ("Complex Double Precision - OMP");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // /**/
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // init_matrix_dcomplexe (gm, zvalue) ;
-  // init_matrix_dcomplexe (hm, zvalue) ;
+  av = average (experiments) ;
 
-  // for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
-  //   {
-  //     start = _rdtsc () ;
+  printf ("Complex Double Precision - OMP");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
+  /**/
 
-  //     end = _rdtsc () ;
-  //     experiments [exp] = end - start ;
-  //   }
+  init_vector_dcomplexe (g, zvalue) ;
+  init_vector_dcomplexe (h, zvalue) ;
+  init_matrix_dcomplexe (*gm, zvalue);
+  init_matrix_dcomplexe (*hm, zvalue);
+  init_matrix_dcomplexe (*czgemm, zvalue);
 
-  // av = average (experiments) ;
+  for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
+    {
+      start = _rdtsc () ;
 
-  // printf ("Complex Double Precision - SSE");
-  // printf ("\t%Ld cycles\n", av-residu) ;
-  // printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
+      end = _rdtsc () ;
+      experiments [exp] = end - start ;
+    }
 
-  // printf ("=============================== TRIS ===============================\n") ;
+  av = average (experiments) ;
 
-  // struct timeval t1;
-  // struct timeval t2;
+  printf ("Complex Double Precision - SSE");
+  printf ("\t%Ld cycles\n", av-residu) ;
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
-  // unsigned long long tresidu, t ;
-  // gettimeofday(&t1, NULL);
-  // gettimeofday(&t2, NULL);
-  // tresidu = (t2.tv_sec-t1.tv_sec)*1000000LL + t2.tv_usec-t1.tv_usec;
-  // //printf("Residu time = %llu ms\n", tresidu);
 
-  // printf ("=============== QUICKSORT ===============\n") ;
+  printf ("=============================== TRIS ===============================\n") ;
 
-  // gettimeofday(&t1, NULL);
-  // // do
-  // gettimeofday(&t2, NULL);
-  // t = ((t2.tv_sec-t1.tv_sec)*1000000LL + t2.tv_usec-t1.tv_usec) - tresidu;
-  // printf ("Sequential : %llu ms\n", t);
+  int tab[SORT_ARRAY_SIZE];
+  random_fill(tab, SORT_ARRAY_SIZE, 20);
 
-  // /**/
+  printf ("=============== QUICKSORT ===============\n") ;
 
-  // gettimeofday(&t1, NULL);
-  // // do
-  // gettimeofday(&t2, NULL);
-  // t = ((t2.tv_sec-t1.tv_sec)*1000000LL + t2.tv_usec-t1.tv_usec) - tresidu;
-  // printf ("OMP : %llu ms\n", t);
+  start = _rdtsc () ;
 
 
-  // printf ("=============== BULLE ===============\n") ;
 
-  // gettimeofday(&t1, NULL);
-  // // do
-  // gettimeofday(&t2, NULL);
-  // t = ((t2.tv_sec-t1.tv_sec)*1000000LL + t2.tv_usec-t1.tv_usec) - tresidu;
-  // printf ("Sequential : %llu ms\n", t);
+  end = _rdtsc () ;
+  printf ("Sequential : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
-  // /**/
+  /**/
 
-  // gettimeofday(&t1, NULL);
-  // // do
-  // gettimeofday(&t2, NULL);
-  // t = ((t2.tv_sec-t1.tv_sec)*1000000LL + t2.tv_usec-t1.tv_usec) - tresidu;
-  // printf ("OMP : %llu ms\n", t);
+  start = _rdtsc () ;
 
 
-  // printf ("=============== FUSION ===============\n") ;
 
-  // gettimeofday(&t1, NULL);
-  // // do
-  // gettimeofday(&t2, NULL);
-  // t = ((t2.tv_sec-t1.tv_sec)*1000000LL + t2.tv_usec-t1.tv_usec) - tresidu;
-  // printf ("Sequential : %llu ms\n", t);
+  end = _rdtsc () ;
+  printf ("Parallel : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
-  // /**/
 
-  // gettimeofday(&t1, NULL);
-  // // do
-  // gettimeofday(&t2, NULL);
-  // t = ((t2.tv_sec-t1.tv_sec)*1000000LL + t2.tv_usec-t1.tv_usec) - tresidu;
-  // printf ("OMP : %llu ms\n", t);
+  printf ("=============== BULLE ===============\n") ;
 
+  start = _rdtsc () ;
+
+
+
+  end = _rdtsc () ;
+  printf ("Sequential : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
+
+  /**/
+
+  start = _rdtsc () ;
+
+
+
+  end = _rdtsc () ;
+  printf ("Parallel : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
+
+
+  printf ("=============== FUSION ===============\n") ;
+
+  start = _rdtsc () ;
+
+
+
+  end = _rdtsc () ;
+  printf ("Sequential : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
+
+  /**/
+
+  start = _rdtsc () ;
+
+
+
+  end = _rdtsc () ;
+  printf ("Parallel : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   return 0;
 }
