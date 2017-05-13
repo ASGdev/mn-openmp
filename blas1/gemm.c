@@ -5,7 +5,7 @@
 #include <nmmintrin.h>
 #include <stdio.h>
 
-#define VEC_SIZE 5
+#define VEC_SIZE 4
 
 typedef float *floatM;
 typedef double *doubleM;
@@ -30,7 +30,7 @@ typedef dcomplexe DCOMP [VEC_SIZE] ;
 
 // typedef float matrix [4][4] ;
 // typedef double matrix [4][4] ;
-typedef vcomplexe matrix[4][4];
+typedef vcomplexe matrix[2][2];
 
 void print_matrix (matrix M, int N)
 {
@@ -680,6 +680,11 @@ void mncblas_cgemm_vec(MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
   float *CP = (float *)C;
   float *bv = (float *)beta;
   float *av = (float *)alpha;
+
+  for(int u = 0 ; u < M*M*2; u++){
+    printf("%f ", *(BP + u));
+  }
+  printf("\n");
   
   __m128 av4 ;
   __m128 bv4 ;
@@ -689,8 +694,8 @@ void mncblas_cgemm_vec(MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
   __m128 rv;
 
   // load alpha & beta
- alphav = _mm_set_ps(*(av), *(av), *(av+1), *(av+1));
- betav = _mm_set_ps(*(bv), *(bv), *(bv+1), *(bv+1));
+ alphav = _mm_set_ps(*(av+1), *(av+1), *(av), *(av));
+ betav = _mm_set_ps(*(bv+1), *(bv+1), *(bv), *(bv));
 
 
   /* NoTrans only */
@@ -699,39 +704,46 @@ void mncblas_cgemm_vec(MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
   printf("M = %d\n", M);
   for (i = 0 ; i < M; i = i + 1) {
 
-    for (j = 0 ; j < M; j ++) {
+    for (j = 0 ; j < M*2; j += 2) {
+
           /*
       load a B column (j)
           */
         for (l = 0 ; l < M ; l = l + 4)
         {
-          // complexe 1
           Bcol [l]     = BP [l        * M + j ] ;
-          Bcol [l + 1] = BP [(l + 1)  * M + j ] ;
-          // complexe 2
+          Bcol [l + 1] = BP [(l  * M + j) + 1] ;
           Bcol [l + 2] = BP [(l + 2)  * M + j ] ;
-          Bcol [l + 3] = BP [(l + 3)  * M + j ] ;
+          Bcol [l + 3] = BP [((l + 2) * M + j) + 1 ] ;
+
         }
-        for(int e = 0; e<M; e++){
-          printf("%f ", Bcol[i]);
+        for(int e = 0; e<M*2; e++){
+          printf("%f ", Bcol[e]);
         }
+        printf("-\n");
 
         r = 0.0 ;
         indice_ligne = i * M ;
 
-        // for (k = 0; k < M; k = k + 2)
-        // {
+        for (k = 0; k < M*2; k = k + 4)
+        {
 
-        //   av4 = _mm_load_ps ((AP+indice_ligne + k));
-        //   bv4 = _mm_load_ps (Bcol+ k) ;
+          float4 t;
+          t[0] = AP[indice_ligne + k + 0];
+          t[1] = AP[indice_ligne + k + 1];
+          t[2] = AP[indice_ligne + k + 2];
+          t[3] = AP[indice_ligne + k + 3];
+          av4 = _mm_load_ps (t);
+          bv4 = _mm_load_ps (Bcol+ k) ;
 
-        //   dot = _mm_dp_ps (av4, bv4, 0xFF) ;
+          dot = _mm_dp_ps (av4, bv4, 0xFF) ;
 
-        //   _mm_store_ps (R4, dot) ;
+          _mm_store_ps (R4, dot) ;
 
-        //   r = r + R4 [0] ;
-        // }
+          r = r + R4 [0] ;
+        }
 
+        rv = _mm_set_ps(r, r, r, r);
         // alpha * r
         __m128 ar = _mm_mul_ps(alphav, rv);
         ar = _mm_addsub_ps(ar, _mm_shuffle_ps(ar, ar, _MM_SHUFFLE(0, 0, 3, 2)));
@@ -744,6 +756,8 @@ void mncblas_cgemm_vec(MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
         __m128 bc = _mm_mul_ps(betav, cv);
         bc = _mm_addsub_ps(bc, _mm_shuffle_ps(bc, bc, _MM_SHUFFLE(0, 0, 3, 2)));
 
+        
+        printf("indice_ligne = %d , j = %d", indice_ligne, j);
 
         CP [indice_ligne + j] = ar[0] + bc[0];
         CP [indice_ligne + j + 1] = ar[1] + bc[1];
@@ -777,30 +791,30 @@ void mncblas_zgemm_vec (
 }
 
 int main(){
-	matrix A = {
-	    {1, 1, 1, 1},
-	    {1, 1, 1, 1},
-	    {1, 1, 1, 1},
-	    {1, 1, 1, 1}
-  	};
-  	matrix B = {
-	    {2, 2, 2, 2},
-	    {2, 2, 2, 2},
-	    {2, 2, 2, 2},
-	    {2, 2, 2, 2}
-  	};
-  	matrix C1 = {
-	    {2, 2, 2, 2},
-	    {2, 2, 2, 2},
-	    {2, 2, 2, 2},
-	    {2, 2, 2, 2}
-  	};
+	// matrix A = {
+	//     {1, 1, 1, 1},
+	//     {1, 1, 1, 1},
+	//     {1, 1, 1, 1},
+	//     {1, 1, 1, 1}
+  // 	};
+  // 	matrix B = {
+	//     {2, 2, 2, 2},
+	//     {2, 2, 2, 2},
+	//     {2, 2, 2, 2},
+	//     {2, 2, 2, 2}
+  // 	};
+  // 	matrix C1 = {
+	//     {2, 2, 2, 2},
+	//     {2, 2, 2, 2},
+	//     {2, 2, 2, 2},
+	//     {2, 2, 2, 2}
+  // 	};
 
-	float alpha = 1;
-	float beta = 1;
+	// float alpha = 1;
+	// float beta = 1;
 
-	mncblas_sgemm_omp (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
-	print_matrix(C1, 4);
+	// mncblas_sgemm_omp (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
+	// print_matrix(C1, 4);
 
 	// matrix C2 = {
 	//     {2, 2, 2, 2},
@@ -819,22 +833,23 @@ int main(){
 
 	// print_matrix(C1, 4);
 
-  // matrix A = {
-  //   {{1,2}, {1,2}},
-  //   {{1,2}, {1,2}}
-  // };
-  // matrix B = {
-  //   {{1,2}, {1,2}},
-  //   {{1,2}, {1,2}}
-  // };
-  // matrix C1 = {
-  //   {{1,2}, {1,2}},
-  //   {{1,2}, {1,2}}
-  // };
+  matrix A = {
+    {{1.0, 2.0}, {1.0,2.0}},
+    {{1.0,2.0}, {1.0,2.0}}
+  };
+  matrix B = {
+    {{1.0,2.0}, {1.0,2.0}},
+    {{1.0,2.0}, {1.0,2.0}}
+  };
+  matrix C1 = {
+    {{1.0,2.0}, {1.0,2.0}},
+    {{1.0,2.0}, {1.0,2.0}}
+  };
 
-  // vcomplexe alpha = {1,2};
-  // vcomplexe beta = {1,2};
+  vcomplexe alpha = {1.0,2.0};
+  vcomplexe beta = {1.0,2.0};
 
-  // mncblas_cgemm_vec (101, 111, 111, 2, 2, 2, &alpha, *A, 1, *B, 1, &beta, *C1, 1);
+  mncblas_cgemm_vec (101, 111, 111, 2, 2, 2, &alpha, *A, 1, *B, 1, &beta, *C1, 1);
+
 	return 0;
 }
