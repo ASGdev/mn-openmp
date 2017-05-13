@@ -159,7 +159,7 @@ void print_vectors_double (doubleVector X, doubleVector Y)
 void random_fill(int tab[], int size, int max){
   srand(time(NULL));
   for(int i = 0; i<size; i++)
-    tab[i] = rand()%max - 1;
+    tab[i] = rand()%max;
 }
 
 
@@ -1458,11 +1458,11 @@ int main ()
 
   floatMatrix cfgemm;
 
-  init_vector_float (a, 1.0) ;
-  init_vector_float (b, 2.0) ;
-  init_matrix_float (am, 1.0);
-  init_matrix_float (bm, 1.0);
-  init_matrix_float (cfgemm, 1.0);
+  // init_vector_float (a, 1.0) ;
+  // init_vector_float (b, 2.0) ;
+  // init_matrix_float (am, 1.0);
+  // init_matrix_float (bm, 1.0);
+  // init_matrix_float (cfgemm, 1.0);
   alphaf = 1.0;
   float betaf = 1.0;
 
@@ -1470,7 +1470,7 @@ int main ()
     {
       start = _rdtsc () ;
 
-      mncblas_sgemm (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
+      //mncblas_sgemm (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1484,17 +1484,17 @@ int main ()
 
   /**/
 
-  init_vector_float (a, 1.0) ;
-  init_vector_float (b, 2.0) ;
-  init_matrix_float (am, 1.0);
-  init_matrix_float (bm, 1.0);
-  init_matrix_float (cfgemm, 1.0);
+  // init_vector_float (a, 1.0) ;
+  // init_vector_float (b, 2.0) ;
+  // init_matrix_float (am, 1.0);
+  // init_matrix_float (bm, 1.0);
+  // init_matrix_float (cfgemm, 1.0);
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
       start = _rdtsc () ;
 
-      mncblas_sgemm_omp (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
+      //mncblas_sgemm_omp (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1508,11 +1508,11 @@ int main ()
 
   /**/
 
-  init_vector_float (a, 1.0) ;
-  init_vector_float (b, 2.0) ;
-  init_matrix_float (am, 1.0);
-  init_matrix_float (bm, 1.0);
-  init_matrix_float (cfgemm, 1.0);
+  // init_vector_float (a, 1.0) ;
+  // init_vector_float (b, 2.0) ;
+  // init_matrix_float (am, 1.0);
+  // init_matrix_float (bm, 1.0);
+  // init_matrix_float (cfgemm, 1.0);
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
@@ -1535,11 +1535,11 @@ int main ()
   double betadgmm = 2.0;
   doubleMatrix *dgemm;
 
-  init_vector_double (c, 1.0) ;
-  init_vector_double (d, 2.0) ;
-  init_matrix_double (cm, 1.0);
-  init_matrix_double (dm, 1.0);
-  init_matrix_double (*dgemm, 1.0);
+  // init_vector_double (c, 1.0) ;
+  // init_vector_double (d, 2.0) ;
+  // init_matrix_double (cm, 1.0);
+  // init_matrix_double (dm, 1.0);
+  // init_matrix_double (*dgemm, 1.0);
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
@@ -1559,11 +1559,11 @@ int main ()
 
   /**/
 
-  init_vector_double (c, 1.0) ;
-  init_vector_double (d, 2.0) ;
-  init_matrix_double (cm, 1.0);
-  init_matrix_double (dm, 1.0);
-  init_matrix_double (*dgemm, 1.0);
+  // init_vector_double (c, 1.0) ;
+  // init_vector_double (d, 2.0) ;
+  // init_matrix_double (cm, 1.0);
+  // init_matrix_double (dm, 1.0);
+  // init_matrix_double (*dgemm, 1.0);
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
@@ -1583,11 +1583,11 @@ int main ()
 
   /**/
 
-  init_vector_double (c, 1.0) ;
-  init_vector_double (d, 2.0) ;
-  init_matrix_double (cm, 1.0);
-  init_matrix_double (dm, 1.0);
-  init_matrix_double (*dgemm, 1.0);
+  // init_vector_double (c, 1.0) ;
+  // init_vector_double (d, 2.0) ;
+  // init_matrix_double (cm, 1.0);
+  // init_matrix_double (dm, 1.0);
+  // init_matrix_double (*dgemm, 1.0);
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
@@ -1611,17 +1611,17 @@ int main ()
   vcomplexe betacgmm = {2.0, 2.0};
   vcompMatrix *ccgemm;
 
-  init_vector_vcomplexe (e, cvalue) ;
-  init_vector_vcomplexe (f, cvalue) ;
-  init_matrix_vcomplexe (*em, cvalue);
-  init_matrix_vcomplexe (*fm, cvalue);
-  init_matrix_vcomplexe (*ccgemm, cvalue);
+  // init_vector_vcomplexe (e, cvalue) ;
+  // init_vector_vcomplexe (f, cvalue) ;
+  // init_matrix_vcomplexe (*em, cvalue);
+  // init_matrix_vcomplexe (*fm, cvalue);
+  // init_matrix_vcomplexe (*ccgemm, cvalue);
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
       start = _rdtsc () ;
 
-      mncblas_cgemm (101, 111, 111, N, N, N, &alphacgmm, *em, 1, *fm, 1, &betacgmm, (float *)ccgemm, 1);
+      //mncblas_cgemm (101, 111, 111, N, N, N, &alphacgmm, *em, 1, *fm, 1, &betacgmm, (float *)ccgemm, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1635,11 +1635,11 @@ int main ()
 
   /**/
 
-  init_vector_vcomplexe (e, cvalue) ;
-  init_vector_vcomplexe (f, cvalue) ;
-  init_matrix_vcomplexe (*em, cvalue);
-  init_matrix_vcomplexe (*fm, cvalue);
-  init_matrix_vcomplexe (*ccgemm, cvalue);
+  // init_vector_vcomplexe (e, cvalue) ;
+  // init_vector_vcomplexe (f, cvalue) ;
+  // init_matrix_vcomplexe (*em, cvalue);
+  // init_matrix_vcomplexe (*fm, cvalue);
+  // init_matrix_vcomplexe (*ccgemm, cvalue);
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
@@ -1659,11 +1659,11 @@ int main ()
 
   /**/
 
-  init_vector_vcomplexe (e, cvalue) ;
-  init_vector_vcomplexe (f, cvalue) ;
-  init_matrix_vcomplexe (*em, cvalue);
-  init_matrix_vcomplexe (*fm, cvalue);
-  init_matrix_vcomplexe (*ccgemm, cvalue);
+  // init_vector_vcomplexe (e, cvalue) ;
+  // init_vector_vcomplexe (f, cvalue) ;
+  // init_matrix_vcomplexe (*em, cvalue);
+  // init_matrix_vcomplexe (*fm, cvalue);
+  // init_matrix_vcomplexe (*ccgemm, cvalue);
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
@@ -1687,17 +1687,17 @@ int main ()
   dcomplexe betazgmm = {2.0, 2.0};
   dcompMatrix *czgemm;
 
-  init_vector_dcomplexe (g, zvalue) ;
-  init_vector_dcomplexe (h, zvalue) ;
-  init_matrix_dcomplexe (*gm, zvalue);
-  init_matrix_dcomplexe (*hm, zvalue);
-  init_matrix_dcomplexe (*czgemm, zvalue);
+  // init_vector_dcomplexe (g, zvalue) ;
+  // init_vector_dcomplexe (h, zvalue) ;
+  // init_matrix_dcomplexe (*gm, zvalue);
+  // init_matrix_dcomplexe (*hm, zvalue);
+  // init_matrix_dcomplexe (*czgemm, zvalue);
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
       start = _rdtsc () ;
 
-      mncblas_zgemm(101, 111, 111, N, N, N, &alphazgmm, *gm, 1, *hm, 1, &betazgmm, (float *)czgemm, 1);
+      //mncblas_zgemm(101, 111, 111, N, N, N, &alphazgmm, *gm, 1, *hm, 1, &betazgmm, (float *)czgemm, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1711,11 +1711,11 @@ int main ()
 
   /**/
 
-  init_vector_dcomplexe (g, zvalue) ;
-  init_vector_dcomplexe (h, zvalue) ;
-  init_matrix_dcomplexe (*gm, zvalue);
-  init_matrix_dcomplexe (*hm, zvalue);
-  init_matrix_dcomplexe (*czgemm, zvalue);
+  // init_vector_dcomplexe (g, zvalue) ;
+  // init_vector_dcomplexe (h, zvalue) ;
+  // init_matrix_dcomplexe (*gm, zvalue);
+  // init_matrix_dcomplexe (*hm, zvalue);
+  // init_matrix_dcomplexe (*czgemm, zvalue);
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
@@ -1734,11 +1734,11 @@ int main ()
 
   /**/
 
-  init_vector_dcomplexe (g, zvalue) ;
-  init_vector_dcomplexe (h, zvalue) ;
-  init_matrix_dcomplexe (*gm, zvalue);
-  init_matrix_dcomplexe (*hm, zvalue);
-  init_matrix_dcomplexe (*czgemm, zvalue);
+  // init_vector_dcomplexe (g, zvalue) ;
+  // init_vector_dcomplexe (h, zvalue) ;
+  // init_matrix_dcomplexe (*gm, zvalue);
+  // init_matrix_dcomplexe (*hm, zvalue);
+  // init_matrix_dcomplexe (*czgemm, zvalue);
 
   for (exp = 0 ; exp < NBEXPERIMENTS; exp++)
     {
@@ -1756,7 +1756,7 @@ int main ()
   printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
 
 
-  printf ("=============================== TRIS ===============================\n") ;
+  printf ("\n=============================== TRIS ===============================\n") ;
 
   int tab[SORT_ARRAY_SIZE];
   random_fill(tab, SORT_ARRAY_SIZE, 20);
@@ -1765,7 +1765,7 @@ int main ()
 
   start = _rdtsc () ;
 
-
+  quick_sort(tab, SORT_ARRAY_SIZE);
 
   end = _rdtsc () ;
   printf ("Sequential : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
@@ -1774,17 +1774,17 @@ int main ()
 
   start = _rdtsc () ;
 
-
+  quick_sort_omp(tab, SORT_ARRAY_SIZE);
 
   end = _rdtsc () ;
   printf ("Parallel : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
 
-  printf ("=============== BULLE ===============\n") ;
+  printf ("\n=============== BULLE ===============\n") ;
 
   start = _rdtsc () ;
 
-
+  bubble_sort(tab, SORT_ARRAY_SIZE);
 
   end = _rdtsc () ;
   printf ("Sequential : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
@@ -1793,17 +1793,17 @@ int main ()
 
   start = _rdtsc () ;
 
-
+  bubble_sort_omp(tab, SORT_ARRAY_SIZE);
 
   end = _rdtsc () ;
   printf ("Parallel : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
 
-  printf ("=============== FUSION ===============\n") ;
+  printf ("\n=============== FUSION ===============\n") ;
 
   start = _rdtsc () ;
 
-
+  //merge_sort(int tab[], int borne_inf, int borne_sup);
 
   end = _rdtsc () ;
   printf ("Sequential : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
@@ -1812,7 +1812,7 @@ int main ()
 
   start = _rdtsc () ;
 
-
+  //merge_sort_omp(int tab[], int borne_inf, int borne_sup);
 
   end = _rdtsc () ;
   printf ("Parallel : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
