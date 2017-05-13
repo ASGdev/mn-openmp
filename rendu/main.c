@@ -1768,7 +1768,7 @@ int main ()
   quick_sort(tab, SORT_ARRAY_SIZE);
 
   end = _rdtsc () ;
-  printf ("Sequential : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("Sequential : %3.6f s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
@@ -1777,7 +1777,7 @@ int main ()
   quick_sort_omp(tab, SORT_ARRAY_SIZE);
 
   end = _rdtsc () ;
-  printf ("Parallel : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("Parallel : %3.6f s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
 
   printf ("\n=============== BULLE ===============\n") ;
@@ -1787,7 +1787,7 @@ int main ()
   bubble_sort(tab, SORT_ARRAY_SIZE);
 
   end = _rdtsc () ;
-  printf ("Sequential : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("Sequential : %3.6f s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
@@ -1796,26 +1796,28 @@ int main ()
   bubble_sort_omp(tab, SORT_ARRAY_SIZE);
 
   end = _rdtsc () ;
-  printf ("Parallel : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("Parallel : %3.6f s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
 
   printf ("\n=============== FUSION ===============\n") ;
 
   start = _rdtsc () ;
 
-  //merge_sort(int tab[], int borne_inf, int borne_sup);
+  // pas bon
+  merge_sort(tab, 0, SORT_ARRAY_SIZE-1);
 
   end = _rdtsc () ;
-  printf ("Sequential : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("Sequential : %3.6f s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
   start = _rdtsc () ;
 
-  //merge_sort_omp(int tab[], int borne_inf, int borne_sup);
+  // pas bon
+  merge_sort_omp(tab, 0, SORT_ARRAY_SIZE-1);
 
   end = _rdtsc () ;
-  printf ("Parallel : %3.6f s", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("Parallel : %3.6f s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   return 0;
 }
