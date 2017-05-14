@@ -651,7 +651,7 @@ void mncblas_cgemm (
   return ;
 }
 
-void mncblas_cgemm_vec(MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
+void mncblas_cgemm_vec (MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
        MNCBLAS_TRANSPOSE TransB, const int M, const int N,
        const int K, const void *alpha, const void *A,
        const int lda, const void *B, const int ldb,
@@ -702,7 +702,7 @@ void mncblas_cgemm_vec(MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
 
   Bcol = aligned_alloc (16, M * sizeof (double)) ;
   printf("M = %d\n", M);
-  for (i = 0 ; i < M; i = i + 1) {
+  for (i = 0 ; i < M*2; i = i + 1) {
 
     for (j = 0 ; j < M*2; j += 2) {
 
@@ -757,7 +757,7 @@ void mncblas_cgemm_vec(MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
         bc = _mm_addsub_ps(bc, _mm_shuffle_ps(bc, bc, _MM_SHUFFLE(0, 0, 3, 2)));
 
         
-        printf("indice_ligne = %d , j = %d", indice_ligne, j);
+        printf("indice_ligne = %d , j = %d\n", indice_ligne, j);
 
         CP [indice_ligne + j] = ar[0] + bc[0];
         CP [indice_ligne + j + 1] = ar[1] + bc[1];
@@ -790,48 +790,116 @@ void mncblas_zgemm_vec (
   return ;
 }
 
+void mncblas_cgemm_vec_new (
+		    MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
+       MNCBLAS_TRANSPOSE TransB, const int M, const int N,
+       const int K, const void *alpha, const void *A,
+       const int lda, const void *B, const int ldb,
+       const void *beta, void *C, const int ldc
+		   )
+{
+  /*
+    vectorized implementation
+  */
+  
+  register unsigned int i ;
+  register unsigned int j ;
+  register unsigned int k ;
+  register unsigned int l ;
+
+  register unsigned int indice_ligne ;
+  
+  register float r ;
+  floatM   Bcol ;
+  float4   R4 ;
+  int      err ;
+
+  __m128 av4 ;
+  __m128 bv4 ;
+  __m128 dot ;
+  __m128 rv;
+
+  float *AP = (float *)A;
+  float *BP = (float *)B;
+  float *CP = (float *)C;
+  float *bv = (float *)beta;
+  float *av = (float *)alpha;
+
+  bv4 = _mm_set_ps(*(bv+1), *(bv+1), *(bv), *(bv));
+  av4 = _mm_set_ps(*(av+1), *(av+1), *(av), *(av));
+
+  Bcol = aligned_alloc (16, M * sizeof (float)) ;
+  
+  for (i = 0 ; i < M*M; i = i + 1)
+	{
+	  
+	  for (j = 0 ; j < M; j ++)
+	    {
+
+	      /*
+		load a B column (j)
+	      */
+
+	      for (l = 0 ; l < M ; l = l + 4)
+        {
+          Bcol [l]     = BP [l        * M + j ] ;
+          Bcol [l + 1] = BP [(l  * M + j) + 1] ;
+          Bcol [l + 2] = BP [(l + 2)  * M + j ] ;
+          Bcol [l + 3] = BP [((l + 2) * M + j) + 1 ] ;     
+        }
+
+	      r = 0.0 ;	  
+	      indice_ligne = i * M ;
+	  
+	      for (k = 0; k < M*M; k = k + 2)
+        {
+          float4 temp;
+          temp[0] = temp[2] = AP[indice_ligne + k];
+          temp[1] = temp[3] = AP[indice_ligne + k + 1];
+          
+          av4 = _mm_load_ps (temp);
+
+          float4 temp2;
+          temp2[0] = temp2[2] = Bcol[0];
+          temp2[1] = temp2[3] = Bcol[1];
+          bv4 = _mm_load_ps (temp2) ;
+          
+          dot = _mm_dp_ps (av4, bv4, 0xFF) ;
+            
+          _mm_store_ps (R4, dot) ;
+
+          r = r + R4 [0] ;
+        }
+        //printf("-> %d\n", indice_ligne+j);
+	      //CP [indice_ligne + j] = (alpha * r) + (beta * C [indice_ligne + j]) ;
+
+        // alpha * r
+        rv = _mm_set_ps(r, r, r, r);
+        __m128 ar = _mm_mul_ps(av4, rv);
+        ar = _mm_addsub_ps(ar, _mm_shuffle_ps(ar, ar, _MM_SHUFFLE(0, 0, 3, 2)));
+        float4 arf;
+        _mm_store_ps(arf, ar);
+
+        // beta * C
+        float4 cl;
+        cl[0] = cl[1] = CP[indice_ligne + j];
+        cl[2] = cl[3] = CP[indice_ligne + j + 1];
+        __m128 cv = _mm_load_ps(cl);
+        __m128 bc = _mm_mul_ps(bv4, cv);
+        bc = _mm_addsub_ps(bc, _mm_shuffle_ps(bc, bc, _MM_SHUFFLE(0, 0, 3, 2)));
+        float4 bcf;
+        _mm_store_ps(bcf, bc);
+
+        CP [indice_ligne + j] = arf[0] + bcf[0] + CP [indice_ligne + j];
+        CP [indice_ligne + j + 1] = arf[1] + bcf[1] + CP [indice_ligne + j + 1];
+	    }
+	}
+   
+  return ;
+}
+
 int main(){
-	// matrix A = {
-	//     {1, 1, 1, 1},
-	//     {1, 1, 1, 1},
-	//     {1, 1, 1, 1},
-	//     {1, 1, 1, 1}
-  // 	};
-  // 	matrix B = {
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2}
-  // 	};
-  // 	matrix C1 = {
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2}
-  // 	};
 
-	// float alpha = 1;
-	// float beta = 1;
-
-	// mncblas_sgemm_omp (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
-	// print_matrix(C1, 4);
-
-	// matrix C2 = {
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2},
-	//     {2, 2, 2, 2}
- //  	};
- //  	mncblas_sgemm_vec (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C2, 1);
-	// print_matrix(C2, 4);
-
-	// double alpha = 1;
-	// double beta = 1;
-
-	// mncblas_dgemm_omp (101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
-	// // mncblas_dgemm_vec(101, 111, 111, 4, 4, 4, alpha, *A, 1, *B, 1, beta, *C1, 1);
-
-	// print_matrix(C1, 4);
 
   matrix A = {
     {{1.0, 2.0}, {1.0,2.0}},
