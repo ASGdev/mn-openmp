@@ -1,57 +1,8 @@
-#include <stdlib.h>
-
 #include "mnblas.h"
-
 #include <nmmintrin.h>
-#include <stdio.h>
-
-#define VEC_SIZE 4
 
 typedef float *floatM;
 typedef double *doubleM;
-
-typedef float float4 [4]  __attribute__ ((aligned (16))) ;
-typedef double double2 [2] __attribute__ ((aligned (16))) ;
-
-typedef struct {
-  float REEL;
-  float IMAG;
-}vcomplexe;
-
-typedef vcomplexe VCOMP [VEC_SIZE] ;
-
-typedef struct {
-  double REEL;
-  double IMAG;
-}dcomplexe;
-
-typedef dcomplexe DCOMP [VEC_SIZE] ;
-
-
-// typedef float matrix [4][4] ;
-// typedef double matrix [4][4] ;
-typedef vcomplexe matrix[2][2];
-
-void print_matrix (matrix M, int N)
-{
-  register unsigned int i, j ;
-
-  for (i = 0 ; i < N; i++)
-    {
-      for (j = 0 ; j < N; j++)
-	{
-	  printf (" %3.2f ", M[i][j]) ;
-	}
-      printf ("\n") ;
-    }
-  printf ("\n") ;
-  return ;
-}
-
-void print_(double *m){
-	for(int i = 0; i< 16; i++)
-		printf("%f ", *(m+i));
-}
 
 void mncblas_sgemm (
               MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
@@ -682,9 +633,9 @@ void mncblas_cgemm_vec (MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
   float *av = (float *)alpha;
 
   for(int u = 0 ; u < M*M*2; u++){
-    printf("%f ", *(BP + u));
+    //printf("%f ", *(BP + u));
   }
-  printf("\n");
+  //printf("\n");
   
   __m128 av4 ;
   __m128 bv4 ;
@@ -701,7 +652,7 @@ void mncblas_cgemm_vec (MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
   /* NoTrans only */
 
   Bcol = aligned_alloc (16, M * sizeof (double)) ;
-  printf("M = %d\n", M);
+  //printf("M = %d\n", M);
   for (i = 0 ; i < M*2; i = i + 1) {
 
     for (j = 0 ; j < M*2; j += 2) {
@@ -718,9 +669,9 @@ void mncblas_cgemm_vec (MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
 
         }
         for(int e = 0; e<M*2; e++){
-          printf("%f ", Bcol[e]);
+          //printf("%f ", Bcol[e]);
         }
-        printf("-\n");
+        //printf("-\n");
 
         r = 0.0 ;
         indice_ligne = i * M ;
@@ -757,7 +708,7 @@ void mncblas_cgemm_vec (MNCBLAS_LAYOUT layout, MNCBLAS_TRANSPOSE TransA,
         bc = _mm_addsub_ps(bc, _mm_shuffle_ps(bc, bc, _MM_SHUFFLE(0, 0, 3, 2)));
 
         
-        printf("indice_ligne = %d , j = %d\n", indice_ligne, j);
+        //printf("indice_ligne = %d , j = %d\n", indice_ligne, j);
 
         CP [indice_ligne + j] = ar[0] + bc[0];
         CP [indice_ligne + j + 1] = ar[1] + bc[1];
@@ -896,28 +847,4 @@ void mncblas_cgemm_vec_new (
 	}
    
   return ;
-}
-
-int main(){
-
-
-  matrix A = {
-    {{1.0, 2.0}, {1.0,2.0}},
-    {{1.0,2.0}, {1.0,2.0}}
-  };
-  matrix B = {
-    {{1.0,2.0}, {1.0,2.0}},
-    {{1.0,2.0}, {1.0,2.0}}
-  };
-  matrix C1 = {
-    {{1.0,2.0}, {1.0,2.0}},
-    {{1.0,2.0}, {1.0,2.0}}
-  };
-
-  vcomplexe alpha = {1.0,2.0};
-  vcomplexe beta = {1.0,2.0};
-
-  mncblas_cgemm_vec (101, 111, 111, 2, 2, 2, &alpha, *A, 1, *B, 1, &beta, *C1, 1);
-
-	return 0;
 }

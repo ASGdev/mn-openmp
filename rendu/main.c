@@ -1811,7 +1811,7 @@ int main ()
   merge_sort(tab, 0, SORT_ARRAY_SIZE-1);
 
   end = _rdtsc () ;
-  printf ("Sequential : %3.6f s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("Sequential : %3.6f s\n", (SORT_ARRAY_SIZE * sizeof(int) / ((1024 * 1024 * 1024)) / ((float)(end - start) / (float)CLOCKS_PER_SEC));
 
   /**/
 
@@ -1820,7 +1820,7 @@ int main ()
   merge_sort_omp(tab, 0, SORT_ARRAY_SIZE-1);
 
   end = _rdtsc () ;
-  printf ("Parallel : %3.6f s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("Parallel : %3.6f s\n", (SORT_ARRAY_SIZE * sizeof(int) / ((1024 * 1024 * 1024)) / ((float)(end - start) / (float)CLOCKS_PER_SEC));
 
   return 0;
 }
