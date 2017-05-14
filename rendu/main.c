@@ -1808,7 +1808,6 @@ int main ()
 
   start = _rdtsc () ;
 
-  // pas bon
   merge_sort(tab, 0, SORT_ARRAY_SIZE-1);
 
   end = _rdtsc () ;
@@ -1818,7 +1817,6 @@ int main ()
 
   start = _rdtsc () ;
 
-  // pas bon
   merge_sort_omp(tab, 0, SORT_ARRAY_SIZE-1);
 
   end = _rdtsc () ;

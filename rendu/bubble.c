@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <omp.h>
+#include "tris.h"
 
 #define CHUNK_SIZE 6
 #define THREAD_NUM 2
@@ -51,5 +52,4 @@ void bubble_sort_omp (int * tab, int tab_size){
             }
         }
     }
-    bulle_trie(tab, tab_size);
 }

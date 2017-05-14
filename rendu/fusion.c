@@ -15,7 +15,7 @@ void merge_sort(int a[], int ig, int id){
 		merge_sort(a, ig, m);
 		merge_sort(a, m+1, id);
 
-		//merge(*a, ig, m, id, m);
+		merge(a, ig, m, id, m);
 	}
 
 }
@@ -31,7 +31,7 @@ void merge_sort_omp(int a[], int ig, int id){
 		merge_sort_omp(a, m+1, id);
 		#pragma omp wait
 
-		//merge(a, ig, id, m);
+		merge(a, ig, m, id, m);
 	}
 
 }

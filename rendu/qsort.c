@@ -26,10 +26,11 @@ void quick_sort_omp(int tab[], int tab_size){
 
 	#pragma omp for schedule(static)
 	for(int i=0; i<num_t; i++){
-		// if(DEBUG)
-		// 	printf("OMP num threads : %d\n", omp_get_num_threads());
-
 		qsort((tab + CHUNK_SIZE * i), CHUNK_SIZE, sizeof(int), compare);
+	}
+
+	for(int j=0; j<num_t; j+=2){
+		merge_tabs(tab, (tab + CHUNK_SIZE * j), CHUNK_SIZE, (tab + CHUNK_SIZE * j + 1), CHUNK_SIZE);
 	}
 
 }
