@@ -732,7 +732,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Simple Precision - sequential\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(float) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -752,7 +752,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Simple Precision - OMP\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(float) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -772,7 +772,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Simple Precision - SSE\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(float) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -792,7 +792,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("\nDouble Precision - sequential\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(double) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -812,7 +812,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Double Precision - OMP\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(double) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -832,7 +832,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Double Precision - SSE\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(double) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -852,7 +852,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("\nComplex Simple Precision - sequential\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(vcomplexe) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -872,7 +872,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Complex Simple Precision - OMP\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(vcomplexe) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -892,7 +892,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Complex Simple Precision - SSE\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(vcomplexe) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -912,7 +912,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("\nComplex Double Precision - sequential\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(dcomplexe) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -932,7 +932,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Complex Double Precision - OMP\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(dcomplexe) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -952,7 +952,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Complex Double Precision - SSE\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(dcomplexe) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   printf ("\n=============== SWAP ===============\n") ;
 
@@ -972,7 +972,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Simple Precision - sequential\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(float) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -992,7 +992,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Simple Precision - OMP\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(float) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -1012,7 +1012,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Simple Precision - SSE\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(float) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -1032,7 +1032,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("\nDouble Precision - sequential\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(double) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -1052,7 +1052,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Double Precision - OMP\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(double) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -1072,7 +1072,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Double Precision - SSE\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(double) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -1092,7 +1092,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("\nComplex Simple Precision - sequential\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(vcomplexe) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -1112,7 +1112,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Complex Simple Precision - OMP\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(vcomplexe) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -1132,7 +1132,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Complex Simple Precision - SSE\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(vcomplexe) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -1152,7 +1152,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("\nComplex Double Precision - sequential\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(dcomplexe) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -1172,7 +1172,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Complex Double Precision - OMP\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(dcomplexe) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   /**/
 
@@ -1192,7 +1192,7 @@ int main ()
   av = average (experiments) ;
 
   printf ("Complex Double Precision - SSE\n");
-  printf ("\t%3.6f Go/s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
+  printf ("\t%3.6f Go/s\n", (float)((((float)N * (float)sizeof(dcomplexe) *  (float)NBEXPERIMENTS ) / (1024.0 * 1024.0 * 1024.0)) / ((float)(end - start) / (float)CLOCKS_PER_SEC)));
 
   printf ("\n=============== GEMV ===============\n") ;
 
@@ -1811,7 +1811,7 @@ int main ()
   merge_sort(tab, 0, SORT_ARRAY_SIZE-1);
 
   end = _rdtsc () ;
-  printf ("Sequential : %3.6f s\n", (SORT_ARRAY_SIZE * sizeof(int) / ((1024 * 1024 * 1024)) / ((float)(end - start) / (float)CLOCKS_PER_SEC));
+  printf ("Sequential : %3.6f s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   /**/
 
@@ -1820,7 +1820,7 @@ int main ()
   merge_sort_omp(tab, 0, SORT_ARRAY_SIZE-1);
 
   end = _rdtsc () ;
-  printf ("Parallel : %3.6f s\n", (SORT_ARRAY_SIZE * sizeof(int) / ((1024 * 1024 * 1024)) / ((float)(end - start) / (float)CLOCKS_PER_SEC));
+  printf ("Parallel : %3.6f s\n", (float)(end - start) / (float)CLOCKS_PER_SEC);
 
   return 0;
 }
