@@ -14,6 +14,7 @@ static long long unsigned int experiments [NBEXPERIMENTS] ;
 #define N              512
 #define TILE           16
 #define SORT_ARRAY_SIZE 512
+#define FREQ_GHZ 0.22
 
 typedef float floatVector [N] ;
 typedef double doubleVector [N] ;
@@ -222,7 +223,7 @@ int main ()
 
   printf ("Simple Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (double) N / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -243,7 +244,7 @@ int main ()
 
   printf ("Simple Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (double) N / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -264,7 +265,7 @@ int main ()
 
   printf ("Simple Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (double) N / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -286,7 +287,7 @@ int main ()
 
   printf ("\nDouble Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (double) N / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -307,7 +308,7 @@ int main ()
 
   printf ("Double Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (double) N / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -328,7 +329,7 @@ int main ()
 
   printf ("Double Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (double) N / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -350,7 +351,7 @@ int main ()
 
   printf ("\nComplex Simple Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (double) N / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -371,7 +372,7 @@ int main ()
 
   printf ("Complex Simple Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (double) N / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -392,7 +393,7 @@ int main ()
 
   printf ("Complex Simple Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (double) N / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -414,7 +415,7 @@ int main ()
 
   printf ("\nComplex Double Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (double) N / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -435,7 +436,7 @@ int main ()
 
   printf ("Complex Double Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (double) N / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -456,7 +457,7 @@ int main ()
 
   printf ("Complex Double Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (double) N / ((double) (av - residu) * (double) FREQ_GHZ));
 
   printf ("\n=============== DOT ===============\n") ;
 
@@ -477,7 +478,7 @@ int main ()
 
   printf ("Simple Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) N) / ((double) (av- residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -498,7 +499,7 @@ int main ()
 
   printf ("Simple Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) N) / ((double) (av- residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -519,7 +520,7 @@ int main ()
 
   printf ("Simple Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) N) / ((double) (av- residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -540,7 +541,7 @@ int main ()
 
   printf ("\nDouble Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) N) / ((double) (av- residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -561,7 +562,7 @@ int main ()
 
   printf ("Double Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) N) / ((double) (av- residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -582,7 +583,7 @@ int main ()
 
   printf ("Double Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) N) / ((double) (av- residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -604,7 +605,7 @@ int main ()
 
   printf ("\nComplex Simple Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) N) / ((double) (av- residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -625,7 +626,7 @@ int main ()
 
   printf ("Complex Simple Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) N) / ((double) (av- residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -646,7 +647,7 @@ int main ()
 
   printf ("Complex Simple Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) N) / ((double) (av- residu) * (double) FREQ_GHZ));
 
   /**/
   dcomplexe zdotu;
@@ -668,7 +669,7 @@ int main ()
 
   printf ("\nComplex Double Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) N) / ((double) (av- residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -689,7 +690,7 @@ int main ()
 
   printf ("Complex Double Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) N) / ((double) (av- residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -710,7 +711,7 @@ int main ()
 
   printf ("Complex Double Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) N) / ((double) (av- residu) * (double) FREQ_GHZ));
 
   printf ("\n=============== COPY ===============\n") ;
 
@@ -1215,7 +1216,7 @@ int main ()
 
   printf ("\nSimple Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1236,7 +1237,7 @@ int main ()
 
   printf ("Simple Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1257,7 +1258,7 @@ int main ()
 
   printf ("Simple Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1280,7 +1281,7 @@ int main ()
 
   printf ("\nDouble Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1301,7 +1302,7 @@ int main ()
 
   printf ("Double Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1322,7 +1323,7 @@ int main ()
 
   printf ("Double Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1346,7 +1347,7 @@ int main ()
 
   printf ("\nComplex Simple Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1367,7 +1368,7 @@ int main ()
 
   printf ("Complex Simple Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1388,7 +1389,7 @@ int main ()
 
   printf ("Complex Simple Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1412,7 +1413,7 @@ int main ()
 
   printf ("\nComplex Double Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1433,7 +1434,7 @@ int main ()
 
   printf ("Complex Double Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1454,7 +1455,7 @@ int main ()
 
   printf ("Complex Double Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   printf ("\n=============== GEMM ===============\n") ;
 
@@ -1472,7 +1473,7 @@ int main ()
     {
       start = _rdtsc () ;
 
-      //mncblas_sgemm (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
+      mncblas_sgemm (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1482,7 +1483,7 @@ int main ()
 
   printf ("Simple Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1496,7 +1497,7 @@ int main ()
     {
       start = _rdtsc () ;
 
-      //mncblas_sgemm_omp (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
+      mncblas_sgemm_omp (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1506,7 +1507,7 @@ int main ()
 
   printf ("Simple Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1520,7 +1521,7 @@ int main ()
     {
       start = _rdtsc () ;
 
-      //mncblas_sgemm_vec (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
+      mncblas_sgemm_vec (101, 111, 111, N, N, N, alphaf, *am, 1, *bm, 1, betaf, *cfgemm, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1530,7 +1531,7 @@ int main ()
 
   printf ("Simple Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
   double alphadgmm = 1.0;
@@ -1547,7 +1548,7 @@ int main ()
     {
       start = _rdtsc () ;
 
-      //mncblas_dgemm (101, 111, 111, N, N, N, alphadgmm, *cm, 1, *dm, 1, betadgmm, (double *)dgemm, 1);
+      mncblas_dgemm (101, 111, 111, N, N, N, alphadgmm, *cm, 1, *dm, 1, betadgmm, (double *)dgemm, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1557,7 +1558,7 @@ int main ()
 
   printf ("\nDouble Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1571,7 +1572,7 @@ int main ()
     {
       start = _rdtsc () ;
 
-      //mncblas_dgemm_omp (101, 111, 111, N, N, N, alphadgmm, *cm, 1, *dm, 1, betadgmm, (double *)dgemm, 1);
+      mncblas_dgemm_omp (101, 111, 111, N, N, N, alphadgmm, *cm, 1, *dm, 1, betadgmm, (double *)dgemm, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1581,7 +1582,7 @@ int main ()
 
   printf ("Double Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1606,7 +1607,7 @@ int main ()
 
   printf ("Double Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1634,7 +1635,7 @@ int main ()
 
   printf ("\nComplex Simple Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1648,7 +1649,7 @@ int main ()
     {
       start = _rdtsc () ;
 
-      //mncblas_cgemm_omp (101, 111, 111, N, N, N, &alphacgmm, *em, 1, *fm, 1, &betacgmm, (float *)ccgemm, 1);
+      mncblas_cgemm_omp (101, 111, 111, N, N, N, &alphacgmm, *em, 1, *fm, 1, &betacgmm, (float *)ccgemm, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1658,7 +1659,7 @@ int main ()
 
   printf ("Complex Simple Precision - OMP\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1682,7 +1683,7 @@ int main ()
 
   printf ("Complex Simple Precision - SSE\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1710,7 +1711,7 @@ int main ()
 
   printf ("\nComplex Double Precision - sequential\n");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1724,7 +1725,7 @@ int main ()
     {
       start = _rdtsc () ;
 
-      //mncblas_zgemm_omp(101, 111, 111, N, N, N, &alphazgmm, *gm, 1, *hm, 1, &betazgmm, (float *)czgemm, 1);
+      mncblas_zgemm_omp(101, 111, 111, N, N, N, &alphazgmm, *gm, 1, *hm, 1, &betazgmm, (float *)czgemm, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1734,7 +1735,7 @@ int main ()
 
   printf ("Complex Double Precision - OMP");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
   /**/
 
@@ -1748,7 +1749,7 @@ int main ()
     {
       start = _rdtsc () ;
 
-      //mncblas_zgemm_vec(101, 111, 111, N, N, N, &alphazgmm, *gm, 1, *hm, 1, &betazgmm, (float *)czgemm, 1);
+      mncblas_zgemm_vec(101, 111, 111, N, N, N, &alphazgmm, *gm, 1, *hm, 1, &betazgmm, (float *)czgemm, 1);
 
       end = _rdtsc () ;
       experiments [exp] = end - start ;
@@ -1758,7 +1759,7 @@ int main ()
 
   printf ("Complex Double Precision - SSE");
   printf ("\t%Ld cycles\n", av-residu) ;
-  printf ("\t%3.6f GFLOP/s\n", ((double) 2 * (double) 0.22)/ ((double) (av - residu)));
+  printf ("\t%3.6f GFLOP/s\n", (((double) 2 * (double) N * (double) N * (double) N)) / ((double) (av - residu) * (double) FREQ_GHZ));
 
 
   printf ("\n=============================== TRIS ===============================\n") ;
